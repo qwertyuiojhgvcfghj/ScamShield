@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Dashboard — ScamShield Pro</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/dashboard.css">
+  <link rel="stylesheet" href="./css/mobile.css">
+</head>
+<body class="dashboard-body">
+  
+  <!-- Mobile Header -->
+  <header class="mobile-dashboard-header">
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <a href="./index.html" class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+          <path d="M12 3L4 7v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V7l-8-4z" stroke="white"/>
+          <circle cx="12" cy="12" r="2.5" fill="white" stroke="none"/>
+        </svg>
+      </div>
+      <span class="logo-text">ScamShield</span>
+    </a>
+    <button class="quick-scan-mobile-btn" onclick="openQuickScan()" aria-label="Quick Scan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </button>
+  </header>
+  
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  
+  <!-- Quick Scan Modal -->
+  <div class="modal-overlay" id="quickScanModal">
+    <div class="modal-content quick-scan-modal">
+      <button class="modal-close" onclick="closeQuickScan()">&times;</button>
+      <h3>⚡ Quick Scan</h3>
+      <textarea id="quickScanInput" placeholder="Paste any suspicious content..."></textarea>
+      <button class="btn btn-primary btn-full" onclick="quickScan()">Analyze Now</button>
+    </div>
+  </div>
+  
+  <!-- Phone Verification Modal -->
+  <div class="modal-overlay" id="phoneVerificationModal">
+    <div class="modal-content phone-verification-modal">
+      <button class="modal-close" onclick="closePhoneVerificationModal()">&times;</button>
+      
+      <!-- Step 1: Enter Phone Number -->
+      <div id="phoneStep1">
+        <h3>📱 Verify Phone Number</h3>
+        <p>Enter your phone number to receive a verification code via email.</p>
+        
+        <div class="form-field">
+          <label>Phone Number</label>
+          <input type="tel" id="verifyPhoneInput" placeholder="+1 (555) 000-0000">
+        </div>
+        
+        <button class="btn btn-primary btn-full" onclick="sendPhoneOTP()">
+          Send Verification Code
+        </button>
+      </div>
+      
+      <!-- Step 2: Enter OTP -->
+      <div id="phoneStep2" style="display: none;">
+        <h3>🔐 Enter Verification Code</h3>
+        <p>We've sent a 6-digit code to your email. Enter it below.</p>
+        
+        <div class="otp-input-group">
+          <input type="text" class="otp-input" maxlength="1" data-index="0" oninput="handleOTPInput(this)">
+          <input type="text" class="otp-input" maxlength="1" data-index="1" oninput="handleOTPInput(this)">
+          <input type="text" class="otp-input" maxlength="1" data-index="2" oninput="handleOTPInput(this)">
+          <input type="text" class="otp-input" maxlength="1" data-index="3" oninput="handleOTPInput(this)">
+          <input type="text" class="otp-input" maxlength="1" data-index="4" oninput="handleOTPInput(this)">
+          <input type="text" class="otp-input" maxlength="1" data-index="5" oninput="handleOTPInput(this)">
+        </div>
+        
+        <div class="otp-timer">
+          <span id="otpTimerText">Code expires in </span>
+          <span id="otpCountdown">10:00</span>
+        </div>
+        
+        <button class="btn btn-primary btn-full" id="verifyOTPBtn" onclick="verifyPhoneOTP()">
+          Verify Phone Number
+        </button>
+        
+        <p style="text-align: center; margin-top: 16px;">
+          Didn't receive the code? 
+          <button class="resend-link" id="resendOTPBtn" onclick="sendPhoneOTP()">Resend</button>
+        </p>
+      </div>
+      
+      <!-- Step 3: Success -->
+      <div id="phoneStep3" style="display: none;">
+        <div style="text-align: center; padding: 20px;">
+          <div style="width: 64px; height: 64px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="width: 32px; height: 32px;">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <h3 style="margin-bottom: 8px;">Phone Verified!</h3>
+          <p style="color: var(--text-muted); margin-bottom: 24px;">Your phone number has been successfully verified.</p>
+          <button class="btn btn-primary" onclick="closePhoneVerificationModal()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="./index.html" class="logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+              <path d="M12 3L4 7v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V7l-8-4z" stroke="white"/>
+              <circle cx="12" cy="12" r="2.5" fill="white" stroke="none"/>
+            </svg>
+          </div>
+          <span class="logo-text">ScamShield</span>
+        </a>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-section-title">Command Center</span>
+          <a href="#" class="sidebar-link active" data-view="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <circle cx="12" cy="12" r="8" stroke-dasharray="4 2"/>
+              <line x1="12" y1="2" x2="12" y2="4"/>
+              <line x1="12" y1="20" x2="12" y2="22"/>
+              <line x1="2" y1="12" x2="4" y2="12"/>
+              <line x1="20" y1="12" x2="22" y2="12"/>
+            </svg>
+            Command Center
+          </a>
+          <a href="#" class="sidebar-link" data-view="xray">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="18" rx="2"/>
+              <line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="4 2"/>
+              <circle cx="12" cy="12" r="4"/>
+            </svg>
+            X-Ray Scanner
+            <span class="nav-glow"></span>
+          </a>
+          <a href="#" class="sidebar-link" data-view="timeline">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 109-9"/>
+              <polyline points="12 7 12 12 15 15"/>
+              <polyline points="3 3 3 9 9 9"/>
+            </svg>
+            Timeline
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <span class="nav-section-title">Developer</span>
+          <a href="#" class="sidebar-link" data-view="api">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+            </svg>
+            API Keys
+          </a>
+          <a href="#" class="sidebar-link" data-view="playground">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            API Playground
+          </a>
+          <a href="#" class="sidebar-link" data-view="logs">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <line x1="10" y1="9" x2="8" y2="9"/>
+            </svg>
+            Request Logs
+          </a>
+          <a href="#" class="sidebar-link" data-view="webhooks">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 16.98h-5.99c-1.1 0-1.95.68-2.95 1.76C8 19.83 6 21 4 21c-1.1 0-2-.9-2-2s.9-2 2-2c1 0 1.8.3 2.5.83l4.48-4.48"/>
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            Webhooks
+          </a>
+          <a href="#" class="sidebar-link" data-view="docs">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            Documentation
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <span class="nav-section-title">System</span>
+          <a href="#" class="sidebar-link" data-view="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+            Settings
+          </a>
+          <a href="./admin.html" class="sidebar-link admin-only-link" id="adminPanelLink" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L3 7v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V7l-9-5z"/>
+              <path d="M12 8v4M12 16h.01"/>
+            </svg>
+            Admin Panel
+            <span style="background:#dc2626;color:white;font-size:0.65rem;padding:0.15rem 0.4rem;border-radius:3px;margin-left:auto;">ADMIN</span>
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="user-avatar" id="userInitials">U</div>
+          <div class="user-info">
+            <span class="user-name" id="userName">Agent</span>
+            <span class="user-role">Pro Shield</span>
+          </div>
+          <button onclick="logout()" class="logout-btn" title="Logout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      
+      <!-- ================================
+           VIEW: COMMAND CENTER
+      ================================= -->
+      <section class="view active" id="view-dashboard">
+        <!-- Hero Status -->
+        <div class="command-hero">
+          <div class="hero-shield">
+            <div class="shield-container">
+              <!-- Radar Eye Scanner -->
+              <svg class="shield-svg" viewBox="0 0 120 120">
+                <defs>
+                  <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#C41E3A"/>
+                    <stop offset="100%" style="stop-color:#8B0000"/>
+                  </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                
+                <!-- Outer Ring -->
+                <circle cx="60" cy="60" r="55" fill="none" stroke="#0A0A0A" stroke-width="4"/>
+                <circle cx="60" cy="60" r="55" fill="none" stroke="url(#radarGrad)" stroke-width="2" stroke-dasharray="8 4" class="radar-outer"/>
+                
+                <!-- Middle Rings -->
+                <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(196,30,58,0.3)" stroke-width="1"/>
+                <circle cx="60" cy="60" r="28" fill="none" stroke="rgba(196,30,58,0.4)" stroke-width="1"/>
+                <circle cx="60" cy="60" r="14" fill="none" stroke="rgba(196,30,58,0.5)" stroke-width="1"/>
+                
+                <!-- Radar Sweep -->
+                <path class="radar-sweep" d="M60 60 L60 5 A55 55 0 0 1 105 35 Z" fill="url(#radarGrad)" opacity="0.4" filter="url(#glow)"/>
+                
+                <!-- Center Eye -->
+                <circle cx="60" cy="60" r="8" fill="#0A0A0A" stroke="#C41E3A" stroke-width="2"/>
+                <circle cx="60" cy="60" r="4" fill="#C41E3A" class="radar-pulse"/>
+                
+                <!-- Crosshairs -->
+                <line x1="60" y1="12" x2="60" y2="38" stroke="#C41E3A" stroke-width="2" opacity="0.6"/>
+                <line x1="60" y1="82" x2="60" y2="108" stroke="#C41E3A" stroke-width="2" opacity="0.6"/>
+                <line x1="12" y1="60" x2="38" y2="60" stroke="#C41E3A" stroke-width="2" opacity="0.6"/>
+                <line x1="82" y1="60" x2="108" y2="60" stroke="#C41E3A" stroke-width="2" opacity="0.6"/>
+                
+                <!-- Corner Brackets -->
+                <path d="M18 35 L18 18 L35 18" fill="none" stroke="#C41E3A" stroke-width="2"/>
+                <path d="M85 18 L102 18 L102 35" fill="none" stroke="#C41E3A" stroke-width="2"/>
+                <path d="M102 85 L102 102 L85 102" fill="none" stroke="#C41E3A" stroke-width="2"/>
+                <path d="M35 102 L18 102 L18 85" fill="none" stroke="#C41E3A" stroke-width="2"/>
+                
+                <!-- Status Check (when secure) -->
+                <path class="shield-check" d="M45 60 L55 70 L78 47" fill="none" stroke="#F5F2EB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div class="shield-glow"></div>
+            </div>
+          </div>
+          <div class="hero-content">
+            <div class="status-label safe">SECURE</div>
+            <h1>All Systems Operational</h1>
+            <p>ScamShield is actively protecting you. No threats detected in the last 24 hours.</p>
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <span class="stat-num" data-target="47">0</span>
+                <span class="stat-label">Days Protected</span>
+              </div>
+              <div class="hero-stat">
+                <span class="stat-num" data-target="892">0</span>
+                <span class="stat-label">Threats Blocked</span>
+              </div>
+              <div class="hero-stat">
+                <span class="stat-num" data-target="99" data-suffix="%">0</span>
+                <span class="stat-label">Accuracy</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button class="action-card primary" onclick="switchView('xray')">
+              <div class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="18" rx="2"/>
+                  <circle cx="12" cy="12" r="4"/>
+                </svg>
+              </div>
+              <div class="action-text">
+                <span class="action-title">X-Ray Scanner</span>
+                <span class="action-desc">Analyze suspicious content</span>
+              </div>
+            </button>
+            <button class="action-card" onclick="switchView('evidence')">
+              <div class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+              </div>
+              <div class="action-text">
+                <span class="action-title">Evidence Board</span>
+                <span class="action-desc">7 threats captured</span>
+              </div>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Bento Grid -->
+        <div class="bento-grid">
+          <!-- Live Feed -->
+          <div class="bento-card bento-large">
+            <div class="bento-header">
+              <span class="live-indicator"></span>
+              <h3>Live Activity Feed</h3>
+              <button class="btn-ghost" onclick="switchView('timeline')">View All</button>
+            </div>
+            <div class="activity-feed" id="activityFeed">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+          
+          <!-- Threat Radar -->
+          <div class="bento-card bento-medium">
+            <div class="bento-header">
+              <h3>Threat Radar</h3>
+            </div>
+            <div class="radar-display">
+              <div class="radar-circle">
+                <div class="radar-sweep"></div>
+                <div class="radar-rings">
+                  <div class="radar-ring"></div>
+                  <div class="radar-ring"></div>
+                  <div class="radar-ring"></div>
+                </div>
+                <div class="radar-blips" id="radarBlips">
+                  <!-- Populated by JS -->
+                </div>
+                <div class="radar-center">
+                  <span id="threatCount">7</span>
+                </div>
+              </div>
+            </div>
+            <div class="radar-legend">
+              <span class="legend-dot phishing"></span>Phishing
+              <span class="legend-dot lottery"></span>Lottery
+              <span class="legend-dot romance"></span>Romance
+            </div>
+          </div>
+          
+          <!-- Protection Score -->
+          <div class="bento-card bento-small">
+            <div class="score-display">
+              <svg class="score-ring" viewBox="0 0 100 100">
+                <circle class="score-track" cx="50" cy="50" r="40"/>
+                <circle class="score-progress" cx="50" cy="50" r="40"/>
+              </svg>
+              <div class="score-center">
+                <span class="score-value" data-target="92">0</span>
+              </div>
+            </div>
+            <span class="score-label">Protection Score</span>
+          </div>
+          
+          <!-- Quick Stats -->
+          <div class="bento-card bento-small stats-card">
+            <div class="quick-stat">
+              <span class="qs-icon safe">✓</span>
+              <span class="qs-value" data-target="247">0</span>
+              <span class="qs-label">Scans</span>
+            </div>
+            <div class="quick-stat">
+              <span class="qs-icon danger">!</span>
+              <span class="qs-value" data-target="32">0</span>
+              <span class="qs-label">Blocked</span>
+            </div>
+          </div>
+          
+          <!-- Threat Types -->
+          <div class="bento-card bento-wide">
+            <div class="bento-header">
+              <h3>Threat Breakdown</h3>
+              <span class="time-badge">This Week</span>
+            </div>
+            <div class="threat-bars">
+              <div class="threat-bar">
+                <span class="tb-icon">🎣</span>
+                <span class="tb-name">Phishing</span>
+                <div class="tb-track"><div class="tb-fill phishing" style="--w:44"></div></div>
+                <span class="tb-count">14</span>
+              </div>
+              <div class="threat-bar">
+                <span class="tb-icon">🎰</span>
+                <span class="tb-name">Lottery</span>
+                <div class="tb-track"><div class="tb-fill lottery" style="--w:28"></div></div>
+                <span class="tb-count">9</span>
+              </div>
+              <div class="threat-bar">
+                <span class="tb-icon">💔</span>
+                <span class="tb-name">Romance</span>
+                <div class="tb-track"><div class="tb-fill romance" style="--w:16"></div></div>
+                <span class="tb-count">5</span>
+              </div>
+              <div class="threat-bar">
+                <span class="tb-icon">🖥️</span>
+                <span class="tb-name">Tech</span>
+                <div class="tb-track"><div class="tb-fill tech" style="--w:12"></div></div>
+                <span class="tb-count">4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: X-RAY SCANNER
+      ================================= -->
+      <section class="view" id="view-xray">
+        <div class="xray-page">
+          <div class="xray-header">
+            <h1>X-Ray Scanner</h1>
+            <p>Expose the hidden truth in any message</p>
+          </div>
+          
+          <div class="xray-machine" id="xrayMachine">
+            <!-- Input State -->
+            <div class="xray-input-state" id="xrayInputState">
+              <div class="machine-frame">
+                <div class="machine-screen">
+                  <textarea id="xrayInput" placeholder="Paste suspicious content here...
+
+Example: 'Congratulations! You've won $1,000,000 in our international lottery. Click here immediately to claim your prize. We need your bank account details for the wire transfer.'"></textarea>
+                </div>
+                <div class="machine-controls">
+                  <div class="control-group">
+                    <label class="control-checkbox">
+                      <input type="checkbox" id="deepScan" checked>
+                      <span>Deep Analysis</span>
+                    </label>
+                  </div>
+                  <button class="scan-button" id="startScanBtn">
+                    <span class="scan-text">INITIATE SCAN</span>
+                    <span class="scan-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 3L4 7v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V7l-8-4z"/>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Scanning State -->
+            <div class="xray-scanning-state hidden" id="xrayScanningState">
+              <div class="scanner-display">
+                <div class="scanner-text" id="scannerTextDisplay"></div>
+                <div class="scanner-beam"></div>
+              </div>
+              <div class="scan-progress">
+                <div class="progress-steps">
+                  <div class="step" data-step="1">Analyzing patterns</div>
+                  <div class="step" data-step="2">Checking reputation</div>
+                  <div class="step" data-step="3">Detecting tactics</div>
+                  <div class="step" data-step="4">Scanning links</div>
+                  <div class="step" data-step="5">Generating report</div>
+                </div>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+              </div>
+            </div>
+            
+            <!-- Result State - Split View -->
+            <div class="xray-result-state hidden" id="xrayResultState">
+              <div class="split-container">
+                <!-- Scammer's Version -->
+                <div class="split-panel panel-scammer">
+                  <div class="panel-label">
+                    <span class="label-icon">🎭</span>
+                    What They Want You to See
+                  </div>
+                  <div class="panel-content" id="scammerContent"></div>
+                </div>
+                
+                <!-- Reveal Slider -->
+                <div class="reveal-slider" id="revealSlider">
+                  <div class="slider-track">
+                    <div class="slider-handle" id="sliderHandle">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                      </svg>
+                      <span>REVEAL</span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Truth Version -->
+                <div class="split-panel panel-truth">
+                  <div class="panel-label">
+                    <span class="label-icon">🔍</span>
+                    The Truth Revealed
+                  </div>
+                  <div class="panel-content" id="truthContent"></div>
+                </div>
+              </div>
+              
+              <!-- Verdict -->
+              <div class="verdict-section" id="verdictSection">
+                <div class="verdict-stamp" id="verdictStamp">
+                  <span>SCAM</span>
+                </div>
+                <div class="verdict-details">
+                  <div class="verdict-row">
+                    <span class="vd-label">Risk Level</span>
+                    <div class="risk-bar">
+                      <div class="risk-fill" id="riskFill"></div>
+                      <span class="risk-value" id="riskValue">0%</span>
+                    </div>
+                  </div>
+                  <div class="verdict-row">
+                    <span class="vd-label">Type</span>
+                    <span class="vd-value" id="scamTypeValue">—</span>
+                  </div>
+                  <div class="verdict-row">
+                    <span class="vd-label">Tactics Used</span>
+                    <div class="tactics-chips" id="tacticsChips"></div>
+                  </div>
+                </div>
+                <div class="verdict-analysis" id="verdictAnalysis"></div>
+                <div class="verdict-actions">
+                  <button class="btn btn-outline" onclick="resetXray()">Scan Another</button>
+                  <button class="btn btn-danger" onclick="reportThreat()">Report Threat</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: TIMELINE
+      ================================= -->
+      <section class="view" id="view-timeline">
+        <div class="view-header">
+          <h1>Activity Timeline</h1>
+          <p>Your protection history</p>
+        </div>
+        
+        <div class="timeline-controls">
+          <div class="filter-pills">
+            <button class="pill active" data-filter="all">All</button>
+            <button class="pill" data-filter="threat">Threats</button>
+            <button class="pill" data-filter="safe">Safe</button>
+          </div>
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" placeholder="Search..." id="timelineSearch">
+          </div>
+        </div>
+        
+        <div class="timeline-feed" id="timelineFeed">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: EVIDENCE BOARD
+      ================================= -->
+      <section class="view" id="view-evidence">
+        <div class="view-header">
+          <h1>Evidence Board</h1>
+          <p>Connect the dots between threats</p>
+        </div>
+        
+        <div class="evidence-container">
+          <div class="cork-board" id="corkBoard">
+            <!-- Polaroid-style threat cards populated by JS -->
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: ANALYTICS
+      ================================= -->
+      <section class="view" id="view-analytics">
+        <div class="view-header">
+          <h1>Threat Intelligence</h1>
+          <p>Insights and patterns</p>
+        </div>
+        
+        <div class="analytics-grid">
+          <div class="analytics-card card-wide">
+            <h3>Weekly Threat Activity</h3>
+            <div class="chart-bars">
+              <div class="chart-bar" style="--h:35"><span class="bar-val">12</span><span class="bar-label">Mon</span></div>
+              <div class="chart-bar" style="--h:55"><span class="bar-val">18</span><span class="bar-label">Tue</span></div>
+              <div class="chart-bar" style="--h:45"><span class="bar-val">15</span><span class="bar-label">Wed</span></div>
+              <div class="chart-bar" style="--h:80"><span class="bar-val">27</span><span class="bar-label">Thu</span></div>
+              <div class="chart-bar" style="--h:60"><span class="bar-val">20</span><span class="bar-label">Fri</span></div>
+              <div class="chart-bar" style="--h:40"><span class="bar-val">13</span><span class="bar-label">Sat</span></div>
+              <div class="chart-bar" style="--h:25"><span class="bar-val">8</span><span class="bar-label">Sun</span></div>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <h3>Accuracy Rate</h3>
+            <div class="donut-chart">
+              <svg viewBox="0 0 100 100">
+                <circle class="donut-bg" cx="50" cy="50" r="40"/>
+                <circle class="donut-fill" cx="50" cy="50" r="40"/>
+              </svg>
+              <div class="donut-center">
+                <span class="donut-value">99.2%</span>
+                <span class="donut-label">Accurate</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="analytics-card">
+            <h3>Top Sources</h3>
+            <div class="source-bars">
+              <div class="source-bar"><span class="src-icon">📧</span><span class="src-name">Email</span><div class="src-track"><div class="src-fill" style="--w:67"></div></div><span class="src-pct">67%</span></div>
+              <div class="source-bar"><span class="src-icon">📱</span><span class="src-name">SMS</span><div class="src-track"><div class="src-fill" style="--w:21"></div></div><span class="src-pct">21%</span></div>
+              <div class="source-bar"><span class="src-icon">💬</span><span class="src-name">Chat</span><div class="src-track"><div class="src-fill" style="--w:12"></div></div><span class="src-pct">12%</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: API & INTEGRATIONS
+      ================================= -->
+      <section class="view" id="view-api">
+        <div class="view-header">
+          <h1>API Keys</h1>
+          <p>Manage your API keys and access</p>
+        </div>
+        
+        <div class="api-keys-page">
+          <!-- Create New Key Section -->
+          <div class="api-keys-create">
+            <h3>Create New API Key</h3>
+            <div class="create-key-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Key Label</label>
+                  <input type="text" id="newKeyLabel" placeholder="e.g., Production, Development, Testing" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label>Environment</label>
+                  <select id="newKeyEnv" class="form-input">
+                    <option value="production">Production (sk_live_)</option>
+                    <option value="test">Test (sk_test_)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Permissions</label>
+                  <div class="permissions-grid">
+                    <label class="permission-checkbox">
+                      <input type="checkbox" checked>
+                      <span>scan:read</span>
+                    </label>
+                    <label class="permission-checkbox">
+                      <input type="checkbox" checked>
+                      <span>scan:write</span>
+                    </label>
+                    <label class="permission-checkbox">
+                      <input type="checkbox" checked>
+                      <span>threats:read</span>
+                    </label>
+                    <label class="permission-checkbox">
+                      <input type="checkbox">
+                      <span>webhooks:manage</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Expiration</label>
+                  <select id="newKeyExpiration" class="form-input">
+                    <option value="never">Never expires</option>
+                    <option value="30">30 days</option>
+                    <option value="90">90 days</option>
+                    <option value="365">1 year</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="createNewApiKey()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Create API Key
+              </button>
+            </div>
+          </div>
+          
+          <!-- Active API Keys List -->
+          <div class="api-keys-list">
+            <div class="api-keys-header">
+              <h3>Your API Keys</h3>
+              <span class="keys-count" id="apiKeysCount">2 keys</span>
+            </div>
+            
+            <div class="keys-table-container">
+              <table class="keys-table">
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Key</th>
+                    <th>Environment</th>
+                    <th>Permissions</th>
+                    <th>Usage</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="apiKeysTableBody">
+                  <tr>
+                    <td>
+                      <div class="key-label-cell">
+                        <span class="key-name">Production App</span>
+                        <span class="key-primary-badge">PRIMARY</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="key-display">
+                        <code class="key-value" id="key1Value">sk_live_••••••••3f8a</code>
+                        <button class="btn-icon btn-tiny" onclick="toggleKeyVisibility(1)" title="Show">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                        </button>
+                        <button class="btn-icon btn-tiny" onclick="copyKey(1)" title="Copy">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                    <td><span class="env-badge live">Live</span></td>
+                    <td>
+                      <div class="permissions-badges">
+                        <span class="perm-badge">scan:read</span>
+                        <span class="perm-badge">scan:write</span>
+                        <span class="perm-more">+1</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="usage-cell">
+                        <span class="usage-count">2,847</span>
+                        <div class="usage-mini-bar">
+                          <div class="usage-mini-fill" style="width: 28%"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="date-cell">Jan 15, 2026</td>
+                    <td>
+                      <div class="key-actions">
+                        <button class="btn-icon" onclick="editKey(1)" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                          </svg>
+                        </button>
+                        <button class="btn-icon danger" onclick="revokeKey(1)" title="Revoke">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="key-label-cell">
+                        <span class="key-name">Development</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="key-display">
+                        <code class="key-value" id="key2Value">sk_test_••••••••9c2b</code>
+                        <button class="btn-icon btn-tiny" onclick="toggleKeyVisibility(2)" title="Show">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                        </button>
+                        <button class="btn-icon btn-tiny" onclick="copyKey(2)" title="Copy">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                    <td><span class="env-badge test">Test</span></td>
+                    <td>
+                      <div class="permissions-badges">
+                        <span class="perm-badge">scan:read</span>
+                        <span class="perm-badge">scan:write</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="usage-cell">
+                        <span class="usage-count">156</span>
+                        <div class="usage-mini-bar">
+                          <div class="usage-mini-fill" style="width: 2%"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="date-cell">Jan 28, 2026</td>
+                    <td>
+                      <div class="key-actions">
+                        <button class="btn-icon" onclick="editKey(2)" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                          </svg>
+                        </button>
+                        <button class="btn-icon danger" onclick="revokeKey(2)" title="Revoke">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Usage Analytics -->
+          <div class="api-usage-analytics">
+            <div class="analytics-header">
+              <h3>Usage Analytics</h3>
+              <div class="analytics-period">
+                <select id="analyticsPeriod" onchange="updateAnalytics()">
+                  <option value="7d">Last 7 days</option>
+                  <option value="30d" selected>Last 30 days</option>
+                  <option value="90d">Last 90 days</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="analytics-stats">
+              <div class="analytics-stat">
+                <div class="stat-icon success">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                  </svg>
+                </div>
+                <div class="stat-details">
+                  <span class="stat-value">3,003</span>
+                  <span class="stat-label">Total Requests</span>
+                </div>
+              </div>
+              <div class="analytics-stat">
+                <div class="stat-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                </div>
+                <div class="stat-details">
+                  <span class="stat-value">98.4%</span>
+                  <span class="stat-label">Success Rate</span>
+                </div>
+              </div>
+              <div class="analytics-stat">
+                <div class="stat-icon warning">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </div>
+                <div class="stat-details">
+                  <span class="stat-value">89ms</span>
+                  <span class="stat-label">Avg Latency</span>
+                </div>
+              </div>
+              <div class="analytics-stat">
+                <div class="stat-icon danger">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </div>
+                <div class="stat-details">
+                  <span class="stat-value">234</span>
+                  <span class="stat-label">Threats Detected</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Usage Chart -->
+            <div class="usage-chart">
+              <div class="chart-header">
+                <span class="chart-title">Daily Request Volume</span>
+                <div class="chart-legend">
+                  <span class="legend-item"><span class="legend-dot success"></span> Successful</span>
+                  <span class="legend-item"><span class="legend-dot error"></span> Errors</span>
+                </div>
+              </div>
+              <div class="chart-container" id="usageChart">
+                <div class="chart-bars">
+                  <div class="chart-bar-group">
+                    <div class="chart-bar" style="height: 40%"><span class="bar-value">80</span></div>
+                    <span class="bar-label">Mon</span>
+                  </div>
+                  <div class="chart-bar-group">
+                    <div class="chart-bar" style="height: 65%"><span class="bar-value">130</span></div>
+                    <span class="bar-label">Tue</span>
+                  </div>
+                  <div class="chart-bar-group">
+                    <div class="chart-bar" style="height: 55%"><span class="bar-value">110</span></div>
+                    <span class="bar-label">Wed</span>
+                  </div>
+                  <div class="chart-bar-group">
+                    <div class="chart-bar" style="height: 80%"><span class="bar-value">160</span></div>
+                    <span class="bar-label">Thu</span>
+                  </div>
+                  <div class="chart-bar-group">
+                    <div class="chart-bar" style="height: 100%"><span class="bar-value">200</span></div>
+                    <span class="bar-label">Fri</span>
+                  </div>
+                  <div class="chart-bar-group">
+                    <div class="chart-bar" style="height: 35%"><span class="bar-value">70</span></div>
+                    <span class="bar-label">Sat</span>
+                  </div>
+                  <div class="chart-bar-group">
+                    <div class="chart-bar" style="height: 25%"><span class="bar-value">50</span></div>
+                    <span class="bar-label">Sun</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Rate Limit Monitor -->
+            <div class="rate-limit-monitor">
+              <div class="rate-limit-header">
+                <h4>Rate Limit Status</h4>
+                <span class="rate-limit-plan">Pro Plan: 10,000/month</span>
+              </div>
+              <div class="rate-limit-bars">
+                <div class="rate-bar">
+                  <div class="rate-bar-info">
+                    <span>Monthly Quota</span>
+                    <span>3,003 / 10,000</span>
+                  </div>
+                  <div class="rate-bar-track">
+                    <div class="rate-bar-fill" style="width: 30%"></div>
+                  </div>
+                </div>
+                <div class="rate-bar">
+                  <div class="rate-bar-info">
+                    <span>Per-Minute Limit</span>
+                    <span>12 / 60</span>
+                  </div>
+                  <div class="rate-bar-track">
+                    <div class="rate-bar-fill safe" style="width: 20%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: API PLAYGROUND
+      ================================= -->
+      <section class="view" id="view-playground">
+        <div class="view-header">
+          <h1>API Playground</h1>
+          <p>Test API endpoints interactively</p>
+        </div>
+        
+        <div class="playground-layout">
+          <!-- Request Builder -->
+          <div class="playground-request">
+            <div class="playground-card">
+              <div class="playground-header">
+                <h3>Request Builder</h3>
+                <div class="endpoint-selector">
+                  <select id="playgroundEndpoint" onchange="updatePlaygroundEndpoint()">
+                    <option value="scan">POST /v1/scan - Analyze Text</option>
+                    <option value="scan-url">POST /v1/scan/url - Check URL</option>
+                    <option value="scan-batch">POST /v1/scan/batch - Batch Scan</option>
+                    <option value="threats">GET /v1/threats - List Threats</option>
+                    <option value="stats">GET /v1/stats - Get Statistics</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="request-config">
+                <div class="config-row">
+                  <span class="method-badge post" id="playgroundMethod">POST</span>
+                  <input type="text" class="endpoint-input" id="playgroundUrl" value="https://api.scamshield.io/v1/scan" readonly>
+                </div>
+                
+                <div class="config-section">
+                  <div class="config-label">
+                    <span>Headers</span>
+                    <button class="btn-icon" onclick="toggleSection('headersSection')">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="config-content" id="headersSection">
+                    <div class="header-row">
+                      <span class="header-key">Authorization</span>
+                      <input type="text" class="header-value" id="playgroundAuthHeader" placeholder="Bearer sk_live_xxxxx">
+                    </div>
+                    <div class="header-row">
+                      <span class="header-key">Content-Type</span>
+                      <span class="header-value-static">application/json</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="config-section" id="bodySection">
+                  <div class="config-label">
+                    <span>Request Body</span>
+                  </div>
+                  <div class="config-content">
+                    <textarea class="json-editor" id="playgroundBody" rows="10">{
+  "text": "Congratulations! You've won $1,000,000! Click here to claim your prize immediately!",
+  "options": {
+    "deep_analysis": true,
+    "include_tactics": true
+  }
+}</textarea>
+                    <div class="json-actions">
+                      <button class="btn-text" onclick="formatJson()">Format JSON</button>
+                      <button class="btn-text" onclick="loadSampleRequest()">Load Sample</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="playground-actions">
+                <button class="btn btn-primary" onclick="sendPlaygroundRequest()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  Send Request
+                </button>
+                <button class="btn btn-ghost" onclick="clearPlayground()">Clear</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Response Viewer -->
+          <div class="playground-response">
+            <div class="playground-card">
+              <div class="playground-header">
+                <h3>Response</h3>
+                <div class="response-meta" id="responseMeta" style="display: none;">
+                  <span class="status-badge" id="responseStatus">200 OK</span>
+                  <span class="response-time" id="responseTime">245ms</span>
+                </div>
+              </div>
+              
+              <div class="response-content" id="responseContent">
+                <div class="response-placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                  <p>Send a request to see the response</p>
+                </div>
+              </div>
+              
+              <div class="response-actions" id="responseActions" style="display: none;">
+                <button class="btn-text" onclick="copyResponse()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                  </svg>
+                  Copy
+                </button>
+                <button class="btn-text" onclick="downloadResponse()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  Download
+                </button>
+              </div>
+            </div>
+            
+            <!-- Request History -->
+            <div class="playground-card history-card">
+              <div class="playground-header">
+                <h3>Recent Requests</h3>
+                <button class="btn-text" onclick="clearPlaygroundHistory()">Clear All</button>
+              </div>
+              <div class="history-list" id="playgroundHistory">
+                <div class="history-empty">
+                  <p>No recent requests</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: REQUEST LOGS
+      ================================= -->
+      <section class="view" id="view-logs">
+        <div class="view-header">
+          <h1>Request Logs</h1>
+          <p>Monitor all API requests and responses</p>
+        </div>
+        
+        <div class="logs-layout">
+          <!-- Logs Filters -->
+          <div class="logs-toolbar">
+            <div class="logs-filters">
+              <div class="filter-group">
+                <label>Status</label>
+                <select id="logsStatusFilter" onchange="filterLogs()">
+                  <option value="all">All Status</option>
+                  <option value="success">Success (2xx)</option>
+                  <option value="error">Errors (4xx, 5xx)</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Endpoint</label>
+                <select id="logsEndpointFilter" onchange="filterLogs()">
+                  <option value="all">All Endpoints</option>
+                  <option value="/v1/scan">/v1/scan</option>
+                  <option value="/v1/scan/url">/v1/scan/url</option>
+                  <option value="/v1/scan/batch">/v1/scan/batch</option>
+                  <option value="/v1/threats">/v1/threats</option>
+                  <option value="/v1/stats">/v1/stats</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Time Range</label>
+                <select id="logsTimeFilter" onchange="filterLogs()">
+                  <option value="1h">Last Hour</option>
+                  <option value="24h" selected>Last 24 Hours</option>
+                  <option value="7d">Last 7 Days</option>
+                  <option value="30d">Last 30 Days</option>
+                </select>
+              </div>
+            </div>
+            <div class="logs-actions">
+              <button class="btn btn-ghost btn-sm" onclick="refreshLogs()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 4 23 10 17 10"/>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="exportLogs()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+          
+          <!-- Logs Stats -->
+          <div class="logs-stats">
+            <div class="log-stat">
+              <div class="stat-value" id="logsTotalRequests">1,247</div>
+              <div class="stat-label">Total Requests</div>
+            </div>
+            <div class="log-stat success">
+              <div class="stat-value" id="logsSuccessRate">98.2%</div>
+              <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="log-stat">
+              <div class="stat-value" id="logsAvgLatency">127ms</div>
+              <div class="stat-label">Avg Latency</div>
+            </div>
+            <div class="log-stat error">
+              <div class="stat-value" id="logsErrorCount">23</div>
+              <div class="stat-label">Errors</div>
+            </div>
+          </div>
+          
+          <!-- Logs Table -->
+          <div class="logs-table-container">
+            <table class="logs-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Method</th>
+                  <th>Endpoint</th>
+                  <th>Status</th>
+                  <th>Latency</th>
+                  <th>API Key</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <tr>
+                  <td class="log-timestamp">2026-02-01 14:23:45</td>
+                  <td><span class="method-badge post">POST</span></td>
+                  <td class="log-endpoint">/v1/scan</td>
+                  <td><span class="status-badge success">200</span></td>
+                  <td class="log-latency">89ms</td>
+                  <td class="log-key">sk_live_...3f8a</td>
+                  <td>
+                    <button class="btn-icon" onclick="viewLogDetails(1)" title="View Details">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="log-timestamp">2026-02-01 14:22:18</td>
+                  <td><span class="method-badge post">POST</span></td>
+                  <td class="log-endpoint">/v1/scan/url</td>
+                  <td><span class="status-badge success">200</span></td>
+                  <td class="log-latency">156ms</td>
+                  <td class="log-key">sk_live_...3f8a</td>
+                  <td>
+                    <button class="btn-icon" onclick="viewLogDetails(2)" title="View Details">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="log-timestamp">2026-02-01 14:20:02</td>
+                  <td><span class="method-badge get">GET</span></td>
+                  <td class="log-endpoint">/v1/stats</td>
+                  <td><span class="status-badge success">200</span></td>
+                  <td class="log-latency">45ms</td>
+                  <td class="log-key">sk_test_...9c2b</td>
+                  <td>
+                    <button class="btn-icon" onclick="viewLogDetails(3)" title="View Details">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr class="error-row">
+                  <td class="log-timestamp">2026-02-01 14:18:33</td>
+                  <td><span class="method-badge post">POST</span></td>
+                  <td class="log-endpoint">/v1/scan</td>
+                  <td><span class="status-badge error">429</span></td>
+                  <td class="log-latency">12ms</td>
+                  <td class="log-key">sk_live_...7d4e</td>
+                  <td>
+                    <button class="btn-icon" onclick="viewLogDetails(4)" title="View Details">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="log-timestamp">2026-02-01 14:15:21</td>
+                  <td><span class="method-badge post">POST</span></td>
+                  <td class="log-endpoint">/v1/scan/batch</td>
+                  <td><span class="status-badge success">200</span></td>
+                  <td class="log-latency">892ms</td>
+                  <td class="log-key">sk_live_...3f8a</td>
+                  <td>
+                    <button class="btn-icon" onclick="viewLogDetails(5)" title="View Details">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Pagination -->
+          <div class="logs-pagination">
+            <span class="pagination-info">Showing 1-5 of 1,247 requests</span>
+            <div class="pagination-controls">
+              <button class="btn-icon" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+              <span class="page-numbers">
+                <button class="page-num active">1</button>
+                <button class="page-num">2</button>
+                <button class="page-num">3</button>
+                <span>...</span>
+                <button class="page-num">250</button>
+              </span>
+              <button class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: WEBHOOKS
+      ================================= -->
+      <section class="view" id="view-webhooks">
+        <div class="view-header">
+          <h1>Webhooks</h1>
+          <p>Configure real-time event notifications</p>
+        </div>
+        
+        <div class="webhooks-layout">
+          <!-- Add Webhook Form -->
+          <div class="webhook-form-card">
+            <h3>Add New Webhook</h3>
+            <div class="webhook-form">
+              <div class="form-group">
+                <label>Endpoint URL</label>
+                <input type="url" id="webhookUrl" placeholder="https://your-app.com/webhooks/scamshield" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Events to Subscribe</label>
+                <div class="checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="eventThreatDetected" checked>
+                    <span class="checkmark"></span>
+                    <span>threat.detected</span>
+                    <span class="event-desc">When a scam is detected</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="eventHighRisk">
+                    <span class="checkmark"></span>
+                    <span>threat.high_risk</span>
+                    <span class="event-desc">High severity threats only</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="eventQuotaWarning">
+                    <span class="checkmark"></span>
+                    <span>quota.warning</span>
+                    <span class="event-desc">When usage reaches 80%</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="eventDailySummary">
+                    <span class="checkmark"></span>
+                    <span>report.daily</span>
+                    <span class="event-desc">Daily summary at midnight UTC</span>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Secret Key (optional)</label>
+                <input type="text" id="webhookSecret" placeholder="whsec_xxxxxxxx" class="form-input">
+                <span class="form-hint">Used to verify webhook signatures</span>
+              </div>
+              <button class="btn btn-primary" onclick="createWebhook()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Create Webhook
+              </button>
+            </div>
+          </div>
+          
+          <!-- Active Webhooks -->
+          <div class="webhooks-list-card">
+            <div class="webhooks-list-header">
+              <h3>Active Webhooks</h3>
+              <span class="webhook-count">2 webhooks</span>
+            </div>
+            
+            <div class="webhooks-list" id="webhooksList">
+              <!-- Webhook 1 -->
+              <div class="webhook-item">
+                <div class="webhook-status active"></div>
+                <div class="webhook-info">
+                  <div class="webhook-url">https://myapp.com/api/webhooks/scam</div>
+                  <div class="webhook-meta">
+                    <span class="webhook-events">
+                      <span class="event-tag">threat.detected</span>
+                      <span class="event-tag">threat.high_risk</span>
+                    </span>
+                    <span class="webhook-created">Created Jan 15, 2026</span>
+                  </div>
+                  <div class="webhook-stats">
+                    <span class="stat-item success">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      1,234 delivered
+                    </span>
+                    <span class="stat-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      Last: 2 min ago
+                    </span>
+                  </div>
+                </div>
+                <div class="webhook-actions">
+                  <button class="btn-icon" onclick="testWebhook(1)" title="Test Webhook">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                  </button>
+                  <button class="btn-icon" onclick="editWebhook(1)" title="Edit">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button class="btn-icon danger" onclick="deleteWebhook(1)" title="Delete">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Webhook 2 -->
+              <div class="webhook-item">
+                <div class="webhook-status active"></div>
+                <div class="webhook-info">
+                  <div class="webhook-url">https://hooks.slack.com/services/T00/B00/xxxx</div>
+                  <div class="webhook-meta">
+                    <span class="webhook-events">
+                      <span class="event-tag">report.daily</span>
+                    </span>
+                    <span class="webhook-created">Created Jan 20, 2026</span>
+                  </div>
+                  <div class="webhook-stats">
+                    <span class="stat-item success">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      12 delivered
+                    </span>
+                    <span class="stat-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      Last: 8 hours ago
+                    </span>
+                  </div>
+                </div>
+                <div class="webhook-actions">
+                  <button class="btn-icon" onclick="testWebhook(2)" title="Test Webhook">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                  </button>
+                  <button class="btn-icon" onclick="editWebhook(2)" title="Edit">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button class="btn-icon danger" onclick="deleteWebhook(2)" title="Delete">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Webhook Logs -->
+            <div class="webhook-logs-section">
+              <h4>Recent Deliveries</h4>
+              <div class="webhook-logs">
+                <div class="webhook-log success">
+                  <span class="log-status">✓</span>
+                  <span class="log-event">threat.detected</span>
+                  <span class="log-url">https://myapp.com/api/webhooks/scam</span>
+                  <span class="log-time">2 min ago</span>
+                  <span class="log-duration">89ms</span>
+                </div>
+                <div class="webhook-log success">
+                  <span class="log-status">✓</span>
+                  <span class="log-event">threat.detected</span>
+                  <span class="log-url">https://myapp.com/api/webhooks/scam</span>
+                  <span class="log-time">15 min ago</span>
+                  <span class="log-duration">112ms</span>
+                </div>
+                <div class="webhook-log failed">
+                  <span class="log-status">✗</span>
+                  <span class="log-event">threat.high_risk</span>
+                  <span class="log-url">https://myapp.com/api/webhooks/scam</span>
+                  <span class="log-time">1 hour ago</span>
+                  <span class="log-error">Timeout</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: API DOCUMENTATION
+      ================================= -->
+      <section class="view" id="view-docs">
+        <div class="view-header">
+          <h1>API Documentation</h1>
+          <p>Complete guide to integrating ScamShield</p>
+        </div>
+        
+        <div class="docs-layout">
+          <!-- Getting Started -->
+          <div class="docs-card docs-getting-started">
+            <div class="docs-card-header">
+              <div class="docs-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+              </div>
+              <h2>Getting Started</h2>
+            </div>
+            
+            <div class="steps-container">
+              <!-- Step 1 -->
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <h4>Generate Your API Key</h4>
+                  <p>Go to <a href="#" onclick="switchView('api'); return false;">API Keys</a> and click "Generate API Key" to create your unique key. This key authenticates all your requests.</p>
+                  <div class="step-tip">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 16v-4"/>
+                      <path d="M12 8h.01"/>
+                    </svg>
+                    <span>Your API key starts with <code>sk_live_</code> and is 40 characters long.</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Step 2 -->
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <h4>Store Your Key Securely</h4>
+                  <p>Copy your API key and store it in a secure location. Use environment variables in your application.</p>
+                  <div class="code-snippet">
+                    <code># .env file<br>SCAMSHIELD_API_KEY=sk_live_your_key_here</code>
+                  </div>
+                  <div class="step-warning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>Never commit your API key to version control or expose it in frontend code!</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Step 3 -->
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <h4>Make Your First API Call</h4>
+                  <p>Send a POST request to our scan endpoint with the text you want to analyze.</p>
+                  <div class="endpoint-box">
+                    <span class="method">POST</span>
+                    <code>https://api.scamshield.io/v1/scan</code>
+                  </div>
+                  <div class="request-example">
+                    <span class="example-label">Request Body:</span>
+                    <pre><code>{
+  "text": "Your suspicious message here",
+  "options": {
+    "deep_analysis": true,
+    "include_tactics": true
+  }
+}</code></pre>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Step 4 -->
+              <div class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                  <h4>Handle the Response</h4>
+                  <p>Parse the JSON response to get the scan results and threat information.</p>
+                  <div class="response-example">
+                    <span class="example-label">Response:</span>
+                    <pre><code>{
+  "status": "success",
+  "is_scam": true,
+  "confidence": 0.94,
+  "threat_type": "phishing",
+  "tactics": ["urgency", "authority", "fear"],
+  "recommendation": "Block this message"
+}</code></pre>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Step 5 -->
+              <div class="step-item">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                  <h4>Implement in Your App</h4>
+                  <p>Integrate the API into your application to protect your users from scams.</p>
+                  <div class="integration-options">
+                    <div class="integration-tag">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                        <line x1="12" y1="18" x2="12.01" y2="18"/>
+                      </svg>
+                      Mobile Apps
+                    </div>
+                    <div class="integration-tag">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                      </svg>
+                      Web Apps
+                    </div>
+                    <div class="integration-tag">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                      </svg>
+                      Backend Services
+                    </div>
+                    <div class="integration-tag">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                      </svg>
+                      Real-time Monitoring
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- API Endpoints -->
+          <div class="docs-card docs-endpoints">
+            <div class="docs-card-header">
+              <div class="docs-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                </svg>
+              </div>
+              <h2>API Endpoints</h2>
+            </div>
+            
+            <div class="endpoints-grid">
+              <!-- Scan Text -->
+              <div class="endpoint-card">
+                <div class="endpoint-header">
+                  <span class="endpoint-method post">POST</span>
+                  <code>/v1/scan</code>
+                </div>
+                <p>Analyze text content for scam patterns and threats.</p>
+                <div class="endpoint-details">
+                  <h5>Parameters</h5>
+                  <table class="params-table">
+                    <tr><td><code>text</code></td><td>string</td><td>Required</td><td>The text to analyze</td></tr>
+                    <tr><td><code>deep_analysis</code></td><td>boolean</td><td>Optional</td><td>Enable thorough analysis</td></tr>
+                    <tr><td><code>include_tactics</code></td><td>boolean</td><td>Optional</td><td>Include detected tactics</td></tr>
+                  </table>
+                </div>
+              </div>
+              
+              <!-- Scan URL -->
+              <div class="endpoint-card">
+                <div class="endpoint-header">
+                  <span class="endpoint-method post">POST</span>
+                  <code>/v1/scan/url</code>
+                </div>
+                <p>Check URLs for phishing attempts and malicious content.</p>
+                <div class="endpoint-details">
+                  <h5>Parameters</h5>
+                  <table class="params-table">
+                    <tr><td><code>url</code></td><td>string</td><td>Required</td><td>The URL to check</td></tr>
+                    <tr><td><code>follow_redirects</code></td><td>boolean</td><td>Optional</td><td>Follow redirect chains</td></tr>
+                  </table>
+                </div>
+              </div>
+              
+              <!-- Get Threat -->
+              <div class="endpoint-card">
+                <div class="endpoint-header">
+                  <span class="endpoint-method get">GET</span>
+                  <code>/v1/threats/{id}</code>
+                </div>
+                <p>Retrieve detailed information about a specific threat.</p>
+                <div class="endpoint-details">
+                  <h5>Parameters</h5>
+                  <table class="params-table">
+                    <tr><td><code>id</code></td><td>string</td><td>Required</td><td>The threat ID</td></tr>
+                  </table>
+                </div>
+              </div>
+              
+              <!-- Get Stats -->
+              <div class="endpoint-card">
+                <div class="endpoint-header">
+                  <span class="endpoint-method get">GET</span>
+                  <code>/v1/stats</code>
+                </div>
+                <p>Get your API usage statistics and quota information.</p>
+                <div class="endpoint-details">
+                  <h5>Response includes</h5>
+                  <ul class="response-list">
+                    <li>Total requests this month</li>
+                    <li>Threats detected count</li>
+                    <li>Remaining quota</li>
+                    <li>Average response time</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <!-- Batch Scan -->
+              <div class="endpoint-card">
+                <div class="endpoint-header">
+                  <span class="endpoint-method post">POST</span>
+                  <code>/v1/scan/batch</code>
+                </div>
+                <p>Analyze multiple messages in a single request (up to 100).</p>
+                <div class="endpoint-details">
+                  <h5>Parameters</h5>
+                  <table class="params-table">
+                    <tr><td><code>messages</code></td><td>array</td><td>Required</td><td>Array of text strings</td></tr>
+                  </table>
+                </div>
+              </div>
+              
+              <!-- Report Threat -->
+              <div class="endpoint-card">
+                <div class="endpoint-header">
+                  <span class="endpoint-method post">POST</span>
+                  <code>/v1/report</code>
+                </div>
+                <p>Report a scam or false positive to improve our detection.</p>
+                <div class="endpoint-details">
+                  <h5>Parameters</h5>
+                  <table class="params-table">
+                    <tr><td><code>text</code></td><td>string</td><td>Required</td><td>The message content</td></tr>
+                    <tr><td><code>is_scam</code></td><td>boolean</td><td>Required</td><td>True if scam</td></tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Code Examples -->
+          <div class="docs-card docs-examples">
+            <div class="docs-card-header">
+              <div class="docs-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <polyline points="9 11 12 14 22 4"/>
+                </svg>
+              </div>
+              <h2>Code Examples</h2>
+            </div>
+            
+            <div class="code-tabs">
+              <button class="code-tab active" data-lang="curl">cURL</button>
+              <button class="code-tab" data-lang="python">Python</button>
+              <button class="code-tab" data-lang="javascript">JavaScript</button>
+              <button class="code-tab" data-lang="nodejs">Node.js</button>
+            </div>
+            
+            <div class="code-block" id="docsCodeCurl">
+              <div class="code-header">
+                <span class="code-lang">cURL</span>
+                <button class="copy-code-btn" onclick="copyCodeExample('curl')">Copy</button>
+              </div>
+              <pre><code># Basic scan request
+curl -X POST "https://api.scamshield.io/v1/scan" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Congratulations! You won $1,000,000. Click here to claim.",
+    "options": {
+      "deep_analysis": true
+    }
+  }'</code></pre>
+            </div>
+            
+            <div class="code-block hidden" id="docsCodePython">
+              <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-code-btn" onclick="copyCodeExample('python')">Copy</button>
+              </div>
+              <pre><code>import requests
+import os
+
+API_KEY = os.getenv('SCAMSHIELD_API_KEY')
+
+def scan_message(text):
+    response = requests.post(
+        "https://api.scamshield.io/v1/scan",
+        headers={"Authorization": f"Bearer {API_KEY}"},
+        json={
+            "text": text,
+            "options": {"deep_analysis": True}
+        }
+    )
+    return response.json()
+
+# Usage
+result = scan_message("Your account has been suspended...")
+if result['is_scam']:
+    print(f"⚠️ Scam detected: {result['threat_type']}")</code></pre>
+            </div>
+            
+            <div class="code-block hidden" id="docsCodeJavascript">
+              <div class="code-header">
+                <span class="code-lang">JavaScript</span>
+                <button class="copy-code-btn" onclick="copyCodeExample('javascript')">Copy</button>
+              </div>
+              <pre><code>async function scanMessage(text) {
+  const response = await fetch('https://api.scamshield.io/v1/scan', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.SCAMSHIELD_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      text: text,
+      options: { deep_analysis: true }
+    })
+  });
+  return await response.json();
+}
+
+// Usage
+const result = await scanMessage('Urgent: Verify your identity now!');
+console.log(result.is_scam ? '⚠️ Scam!' : '✅ Safe');</code></pre>
+            </div>
+            
+            <div class="code-block hidden" id="docsCodeNodejs">
+              <div class="code-header">
+                <span class="code-lang">Node.js</span>
+                <button class="copy-code-btn" onclick="copyCodeExample('nodejs')">Copy</button>
+              </div>
+              <pre><code>const axios = require('axios');
+
+const scamshield = axios.create({
+  baseURL: 'https://api.scamshield.io/v1',
+  headers: {
+    'Authorization': `Bearer ${process.env.SCAMSHIELD_API_KEY}`
+  }
+});
+
+// Scan a single message
+async function scan(text) {
+  const { data } = await scamshield.post('/scan', { text });
+  return data;
+}
+
+// Batch scan multiple messages
+async function batchScan(messages) {
+  const { data } = await scamshield.post('/scan/batch', { messages });
+  return data;
+}</code></pre>
+            </div>
+          </div>
+          
+          <!-- Error Codes -->
+          <div class="docs-card docs-errors">
+            <div class="docs-card-header">
+              <div class="docs-icon error-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              </div>
+              <h2>Error Codes</h2>
+            </div>
+            
+            <div class="error-table">
+              <div class="error-row header">
+                <span>Code</span>
+                <span>Name</span>
+                <span>Description</span>
+              </div>
+              <div class="error-row">
+                <span class="error-code">400</span>
+                <span>Bad Request</span>
+                <span>Invalid request body or missing required fields</span>
+              </div>
+              <div class="error-row">
+                <span class="error-code">401</span>
+                <span>Unauthorized</span>
+                <span>Invalid or missing API key</span>
+              </div>
+              <div class="error-row">
+                <span class="error-code">403</span>
+                <span>Forbidden</span>
+                <span>API key doesn't have permission</span>
+              </div>
+              <div class="error-row">
+                <span class="error-code">429</span>
+                <span>Too Many Requests</span>
+                <span>Rate limit exceeded (100 req/min)</span>
+              </div>
+              <div class="error-row">
+                <span class="error-code">500</span>
+                <span>Server Error</span>
+                <span>Internal server error - try again later</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Rate Limits -->
+          <div class="docs-card docs-limits">
+            <div class="docs-card-header">
+              <div class="docs-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <h2>Rate Limits</h2>
+            </div>
+            
+            <div class="limits-grid">
+              <div class="limit-card">
+                <div class="limit-value">100</div>
+                <div class="limit-label">Requests per minute</div>
+              </div>
+              <div class="limit-card">
+                <div class="limit-value">10,000</div>
+                <div class="limit-label">Requests per month (Free)</div>
+              </div>
+              <div class="limit-card">
+                <div class="limit-value">100,000</div>
+                <div class="limit-label">Requests per month (Pro)</div>
+              </div>
+              <div class="limit-card">
+                <div class="limit-value">Unlimited</div>
+                <div class="limit-label">Enterprise plan</div>
+              </div>
+            </div>
+            
+            <div class="limits-note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4"/>
+                <path d="M12 8h.01"/>
+              </svg>
+              <span>Rate limit headers are included in every response: <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code></span>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================================
+           VIEW: SETTINGS
+      ================================= -->
+      <section class="view" id="view-settings">
+        <div class="view-header">
+          <h1>Settings</h1>
+          <p>Configure your protection preferences</p>
+        </div>
+        
+        <div class="settings-layout">
+          <!-- Profile Section -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <h3>Profile</h3>
+            </div>
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Full Name</label>
+                <input type="text" id="settingsName" placeholder="Your name">
+              </div>
+              <div class="form-field">
+                <label>Email Address</label>
+                <input type="email" id="settingsEmail" placeholder="your@email.com" readonly>
+              </div>
+              <div class="form-field">
+                <label>Phone Number</label>
+                <input type="tel" id="settingsPhone" placeholder="+1 (555) 000-0000">
+              </div>
+              <div class="form-field">
+                <label>Organization</label>
+                <input type="text" id="settingsOrg" placeholder="Company name (optional)">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Verification Section -->
+          <div class="settings-card" id="verificationCard">
+            <div class="settings-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              <h3>Account Verification</h3>
+            </div>
+            <div class="verification-status-grid">
+              <!-- Email Verification -->
+              <div class="verification-item">
+                <div class="verification-icon email-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                </div>
+                <div class="verification-info">
+                  <span class="verification-title">Email Verification</span>
+                  <span class="verification-status" id="emailVerificationStatus">Checking...</span>
+                </div>
+                <button class="btn btn-sm btn-outline" id="resendEmailBtn" style="display: none;" onclick="resendVerificationEmail()">Resend</button>
+                <span class="verification-badge verified" id="emailVerifiedBadge" style="display: none;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  Verified
+                </span>
+              </div>
+              
+              <!-- Phone Verification -->
+              <div class="verification-item">
+                <div class="verification-icon phone-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </div>
+                <div class="verification-info">
+                  <span class="verification-title">Phone Verification</span>
+                  <span class="verification-status" id="phoneVerificationStatus">Not verified</span>
+                </div>
+                <button class="btn btn-sm btn-primary" id="verifyPhoneBtn" onclick="openPhoneVerificationModal()">Verify</button>
+                <span class="verification-badge verified" id="phoneVerifiedBadge" style="display: none;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  Verified
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Protection Settings -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <h3>Protection</h3>
+            </div>
+            <div class="toggle-list">
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Real-time Protection</span>
+                  <span class="toggle-desc">Automatically scan incoming messages</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleRealtime" checked>
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Deep Analysis Mode</span>
+                  <span class="toggle-desc">Use advanced AI for thorough detection</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleDeepAnalysis" checked>
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Auto-block Threats</span>
+                  <span class="toggle-desc">Automatically block detected scam attempts</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleAutoBlock">
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Link Scanner</span>
+                  <span class="toggle-desc">Check URLs for phishing attempts</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleLinkScanner" checked>
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+            
+            <div class="setting-section">
+              <label class="setting-label">Detection Sensitivity</label>
+              <div class="sensitivity-slider">
+                <input type="range" min="1" max="3" value="2" id="sensitivityRange">
+                <div class="sensitivity-labels">
+                  <span>Low</span>
+                  <span>Medium</span>
+                  <span>High</span>
+                </div>
+              </div>
+              <p class="setting-hint">Higher sensitivity may flag more legitimate messages</p>
+            </div>
+          </div>
+          
+          <!-- Notifications -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 01-3.46 0"/>
+              </svg>
+              <h3>Notifications</h3>
+            </div>
+            <div class="toggle-list">
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Email Alerts</span>
+                  <span class="toggle-desc">Receive threat alerts via email</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleEmailAlerts" checked>
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Push Notifications</span>
+                  <span class="toggle-desc">Browser push notifications</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="togglePushNotif">
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Weekly Summary</span>
+                  <span class="toggle-desc">Get a weekly protection report</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleWeekly" checked>
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Critical Alerts Only</span>
+                  <span class="toggle-desc">Only notify for high-risk threats</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleCriticalOnly">
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Privacy & Data -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+              <h3>Privacy & Data</h3>
+            </div>
+            <div class="toggle-list">
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Save Scan History</span>
+                  <span class="toggle-desc">Keep records of all scans</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleHistory" checked>
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+              <label class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Anonymous Analytics</span>
+                  <span class="toggle-desc">Help improve detection (no personal data)</span>
+                </div>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleAnalytics" checked>
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+            
+            <div class="data-actions">
+              <button class="btn btn-outline" onclick="exportData()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export My Data
+              </button>
+              <button class="btn btn-danger-outline" onclick="clearHistory()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+                Clear History
+              </button>
+            </div>
+          </div>
+          
+          <!-- Account Actions -->
+          <div class="settings-card settings-card-danger">
+            <div class="settings-card-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <h3>Danger Zone</h3>
+            </div>
+            <div class="danger-actions">
+              <div class="danger-item">
+                <div class="danger-info">
+                  <span class="danger-title">Change Password</span>
+                  <span class="danger-desc">Update your account password</span>
+                </div>
+                <button class="btn btn-outline btn-sm">Change</button>
+              </div>
+              <div class="danger-item">
+                <div class="danger-info">
+                  <span class="danger-title">Delete Account</span>
+                  <span class="danger-desc">Permanently delete your account and data</span>
+                </div>
+                <button class="btn btn-danger btn-sm">Delete</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Save Button -->
+          <div class="settings-actions">
+            <button class="btn btn-outline" onclick="resetSettings()">Reset to Defaults</button>
+            <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+          </div>
+        </div>
+      </section>
+      
+    </main>
+  </div>
+  
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <script src="./js/api.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/dashboard.js"></script>
+</body>
+</html>

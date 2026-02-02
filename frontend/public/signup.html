@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — ScamShield Pro</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --cream: #F5F2EB;
+      --ink: #0A0A0A;
+      --crimson: #C41E3A;
+      --text-muted: #6B6B6B;
+      --border: #E5E5E5;
+      --white: #FFFFFF;
+      --success: #059669;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* Animated background */
+    .bg-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(196, 30, 58, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+    }
+    
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--crimson);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: rise 15s infinite;
+    }
+    
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 20%; animation-delay: 2s; }
+    .particle:nth-child(3) { left: 30%; animation-delay: 4s; }
+    .particle:nth-child(4) { left: 40%; animation-delay: 1s; }
+    .particle:nth-child(5) { left: 50%; animation-delay: 3s; }
+    .particle:nth-child(6) { left: 60%; animation-delay: 5s; }
+    .particle:nth-child(7) { left: 70%; animation-delay: 2.5s; }
+    .particle:nth-child(8) { left: 80%; animation-delay: 4.5s; }
+    .particle:nth-child(9) { left: 90%; animation-delay: 1.5s; }
+    
+    @keyframes rise {
+      0% { 
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% { opacity: 0.3; }
+      90% { opacity: 0.3; }
+      100% { 
+        transform: translateY(-100vh) scale(1);
+        opacity: 0;
+      }
+    }
+    
+    /* Signup card */
+    .signup-card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      background: var(--white);
+      border-radius: 24px;
+      padding: 48px 40px;
+      box-shadow: 
+        0 0 0 1px rgba(0,0,0,0.05),
+        0 25px 50px -12px rgba(0,0,0,0.5);
+    }
+    
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--crimson), #8B0000);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+    }
+    
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: white;
+      fill: none;
+    }
+    
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    
+    .logo-text span {
+      color: var(--crimson);
+    }
+    
+    /* Progress Steps */
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    
+    .step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s;
+    }
+    
+    .step-dot.active {
+      background: var(--crimson);
+      transform: scale(1.2);
+    }
+    
+    .step-dot.completed {
+      background: var(--success);
+    }
+    
+    .step-line {
+      width: 40px;
+      height: 2px;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+    
+    .step-line.completed {
+      background: var(--success);
+    }
+    
+    /* Header */
+    .card-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    
+    .card-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    
+    .card-header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    
+    /* Form Steps */
+    .form-step {
+      display: none;
+    }
+    
+    .form-step.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Form */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    
+    .input-wrapper {
+      position: relative;
+    }
+    
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--ink);
+      transition: all 0.2s;
+    }
+    
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 44px;
+    }
+    
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--crimson);
+      box-shadow: 0 0 0 4px rgba(196, 30, 58, 0.1);
+    }
+    
+    input::placeholder {
+      color: #B0B0B0;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 4px;
+      display: flex;
+    }
+    
+    .password-toggle:hover {
+      color: var(--ink);
+    }
+    
+    .password-toggle svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    /* Password Strength */
+    .password-strength {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    
+    .strength-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      transition: background 0.3s;
+    }
+    
+    .strength-bar.weak { background: #ef4444; }
+    .strength-bar.fair { background: #f59e0b; }
+    .strength-bar.good { background: #3b82f6; }
+    .strength-bar.strong { background: var(--success); }
+    
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: var(--ink);
+      color: var(--white);
+    }
+    
+    .btn-primary:hover {
+      background: var(--crimson);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+      border: 2px solid var(--border);
+    }
+    
+    .btn-outline:hover {
+      border-color: var(--ink);
+      background: rgba(0,0,0,0.02);
+    }
+    
+    .btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .btn-full {
+      width: 100%;
+    }
+    
+    /* Success State */
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--success), #047857);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      animation: successPop 0.5s ease;
+    }
+    
+    .success-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: white;
+    }
+    
+    @keyframes successPop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Feature list */
+    .features-list {
+      margin: 24px 0;
+      text-align: left;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    
+    .feature-item svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--success);
+      flex-shrink: 0;
+    }
+    
+    /* Footer */
+    .card-footer {
+      text-align: center;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .card-footer p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    
+    .card-footer a {
+      color: var(--crimson);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .card-footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Terms */
+    .terms-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+    
+    .terms-text a {
+      color: var(--crimson);
+      text-decoration: none;
+    }
+    
+    .terms-text a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .toast {
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: white;
+      animation: toastIn 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--crimson); }
+    .toast.info { background: var(--ink); }
+    
+    @keyframes toastIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* Mobile - Enhanced */
+    @media (max-width: 768px) {
+      body { 
+        padding: 20px;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+      }
+      
+      .signup-card { 
+        padding: 36px 28px;
+        border-radius: 20px;
+      }
+      
+      .logo {
+        margin-bottom: 32px;
+      }
+      
+      .logo-icon {
+        width: 44px;
+        height: 44px;
+      }
+      
+      .logo-text {
+        font-size: 1.35rem;
+      }
+      
+      .card-header h1 { 
+        font-size: 1.6rem;
+        margin-bottom: 6px;
+      }
+      
+      .card-header p {
+        font-size: 0.9rem;
+      }
+      
+      /* Step indicators mobile */
+      .steps {
+        gap: 4px;
+        margin-bottom: 24px;
+      }
+      
+      .step-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+      }
+      
+      .step-label {
+        font-size: 0.6rem;
+        max-width: 50px;
+        text-align: center;
+      }
+      
+      .step-line {
+        width: 16px;
+      }
+      
+      .form-group {
+        margin-bottom: 16px;
+      }
+      
+      input[type="email"],
+      input[type="password"],
+      input[type="text"],
+      input[type="tel"] {
+        font-size: 16px !important;
+        padding: 14px 16px;
+        border-radius: 12px;
+      }
+      
+      .password-strength {
+        gap: 3px;
+      }
+      
+      .strength-bar {
+        height: 3px;
+      }
+      
+      .btn-submit {
+        padding: 14px 24px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+        margin-top: 4px;
+      }
+      
+      .card-footer {
+        padding-top: 20px;
+        font-size: 0.9rem;
+      }
+      
+      .checkbox-row {
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body { padding: 16px; }
+      .signup-card { 
+        padding: 28px 20px;
+        border-radius: 18px;
+      }
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+      }
+      .logo-text {
+        font-size: 1.2rem;
+      }
+      .card-header {
+        margin-bottom: 20px;
+      }
+      .card-header h1 { font-size: 1.4rem; }
+      .card-header p { font-size: 0.85rem; }
+      
+      .step-label {
+        display: none;
+      }
+      
+      .step-circle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+      }
+      
+      .step-line {
+        width: 10px;
+        margin-bottom: 0;
+      }
+      
+      .particle {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg-pattern"></div>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+  
+  <!-- Signup Card -->
+  <div class="signup-card">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" stroke-width="2">
+          <path d="M12 3L4 7v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V7l-8-4z"/>
+        </svg>
+      </div>
+      <div class="logo-text">Scam<span>Shield</span></div>
+    </div>
+    
+    <!-- Progress -->
+    <div class="progress-steps">
+      <div class="step-dot active" data-step="1"></div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-dot" data-step="2"></div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-dot" data-step="3"></div>
+    </div>
+    
+    <form id="signupForm">
+      <!-- Step 1: Account -->
+      <div class="form-step active" id="step1">
+        <div class="card-header">
+          <h1>Create account</h1>
+          <p>Start your protection journey today</p>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Create password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" name="password" placeholder="Min. 8 characters" required minlength="8">
+            <button type="button" class="password-toggle" aria-label="Toggle password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <div class="password-strength">
+            <div class="strength-bar" id="s1"></div>
+            <div class="strength-bar" id="s2"></div>
+            <div class="strength-bar" id="s3"></div>
+            <div class="strength-bar" id="s4"></div>
+          </div>
+        </div>
+        
+        <button type="button" class="btn btn-primary btn-full" onclick="nextStep(2)">
+          <span>Continue</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+        
+        <p class="terms-text">
+          By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+        </p>
+      </div>
+      
+      <!-- Step 2: Profile -->
+      <div class="form-step" id="step2">
+        <div class="card-header">
+          <h1>Your profile</h1>
+          <p>Tell us a bit about yourself</p>
+        </div>
+        
+        <div class="form-group">
+          <label for="fullName">Full name</label>
+          <input type="text" id="fullName" name="fullName" placeholder="John Doe" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="useCase">How will you use ScamShield?</label>
+          <select id="useCase" name="useCase">
+            <option value="">Select your use case</option>
+            <option value="personal">Personal Protection</option>
+            <option value="business">Business Security</option>
+            <option value="family">Family Safety</option>
+            <option value="developer">API Integration</option>
+          </select>
+        </div>
+        
+        <div class="btn-row">
+          <button type="button" class="btn btn-outline" onclick="prevStep(1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back
+          </button>
+          <button type="button" class="btn btn-primary" onclick="nextStep(3)">
+            Continue
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Step 3: Success / Verification Notice -->
+      <div class="form-step" id="step3">
+        <div class="success-icon" id="successIcon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        
+        <div class="card-header" id="successHeader">
+          <h1>Almost there!</h1>
+          <p>Please verify your email to continue</p>
+        </div>
+        
+        <div id="verificationNotice" style="text-align: center; margin: 20px 0;">
+          <p style="color: var(--text-muted); line-height: 1.6;">
+            We've sent a verification email to<br>
+            <strong id="verificationEmail" style="color: var(--crimson);"></strong>
+          </p>
+          <p style="color: var(--text-muted); font-size: 14px; margin-top: 16px;">
+            Click the link in the email to verify your account and unlock all features.
+          </p>
+        </div>
+        
+        <div class="features-list">
+          <div class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span>Real-time scam detection powered by AI</span>
+          </div>
+          <div class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span>24/7 protection across all channels</span>
+          </div>
+          <div class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span>Instant threat alerts and reports</span>
+          </div>
+          <div class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span>API access for developers</span>
+          </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <button type="submit" class="btn btn-primary btn-full" id="continueBtn">
+            <span>Continue to Dashboard</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+          
+          <button type="button" class="btn btn-outline btn-full" onclick="resendVerificationEmail()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <span>Resend Verification Email</span>
+          </button>
+        </div>
+        
+        <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 16px;">
+          Didn't receive the email? Check your spam folder or click resend.
+        </p>
+      </div>
+    </form>
+    
+    <div class="card-footer" id="footerLink">
+      <p>Already have an account? <a href="./login.html">Sign in</a></p>
+    </div>
+  </div>
+  
+  <div id="toastContainer" class="toast-container"></div>
+  
+  <script>
+    let currentStep = 1;
+    
+    // Password toggle
+    document.querySelector('.password-toggle').addEventListener('click', function() {
+      const input = document.getElementById('password');
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      this.innerHTML = isPassword 
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    });
+    
+    // Password strength
+    document.getElementById('password').addEventListener('input', function() {
+      const val = this.value;
+      const bars = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3'), document.getElementById('s4')];
+      
+      // Reset
+      bars.forEach(b => b.className = 'strength-bar');
+      
+      if (val.length === 0) return;
+      
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[a-z]/.test(val) && /[A-Z]/.test(val)) score++;
+      if (/\d/.test(val)) score++;
+      if (/[^a-zA-Z0-9]/.test(val)) score++;
+      
+      const classes = ['weak', 'fair', 'good', 'strong'];
+      for (let i = 0; i < score; i++) {
+        bars[i].classList.add(classes[Math.min(score - 1, 3)]);
+      }
+    });
+    
+    // Step navigation
+    function nextStep(step) {
+      // Validate current step
+      if (currentStep === 1) {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        
+        if (!email) {
+          showToast('Please enter your email', 'error');
+          return;
+        }
+        if (password.length < 8) {
+          showToast('Password must be at least 8 characters', 'error');
+          return;
+        }
+      }
+      
+      if (currentStep === 2) {
+        const name = document.getElementById('fullName').value.trim();
+        if (!name) {
+          showToast('Please enter your name', 'error');
+          return;
+        }
+      }
+      
+      // Update steps
+      document.getElementById(`step${currentStep}`).classList.remove('active');
+      document.getElementById(`step${step}`).classList.add('active');
+      
+      // Update dots
+      document.querySelectorAll('.step-dot').forEach((dot, i) => {
+        dot.classList.remove('active', 'completed');
+        if (i + 1 < step) dot.classList.add('completed');
+        if (i + 1 === step) dot.classList.add('active');
+      });
+      
+      // Update lines
+      if (step >= 2) document.getElementById('line1').classList.add('completed');
+      if (step >= 3) document.getElementById('line2').classList.add('completed');
+      
+      // Hide footer on success step
+      if (step === 3) {
+        document.getElementById('footerLink').style.display = 'none';
+      }
+      
+      currentStep = step;
+    }
+    
+    function prevStep(step) {
+      document.getElementById(`step${currentStep}`).classList.remove('active');
+      document.getElementById(`step${step}`).classList.add('active');
+      
+      document.querySelectorAll('.step-dot').forEach((dot, i) => {
+        dot.classList.remove('active', 'completed');
+        if (i + 1 < step) dot.classList.add('completed');
+        if (i + 1 === step) dot.classList.add('active');
+      });
+      
+      if (step < 2) document.getElementById('line1').classList.remove('completed');
+      if (step < 3) document.getElementById('line2').classList.remove('completed');
+      
+      currentStep = step;
+    }
+    
+    // Toast
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.animation = 'toastIn 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+    
+    // Form submit - Now uses actual API
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const name = document.getElementById('fullName').value.trim();
+      const phone = document.getElementById('phone')?.value?.trim() || '';
+      
+      // Disable submit button
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="btn-loader"></span> Creating account...';
+      
+      try {
+        // Call the registration API
+        const response = await fetch('http://localhost:8001/api/v1/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+            full_name: name,
+            phone: phone || null
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          // Handle validation errors
+          let errorMsg = 'Registration failed';
+          if (data.detail) {
+            if (typeof data.detail === 'string') {
+              errorMsg = data.detail;
+            } else if (Array.isArray(data.detail)) {
+              errorMsg = data.detail.map(e => e.msg || e.message || e).join(', ');
+            } else if (data.detail.message) {
+              errorMsg = data.detail.message;
+            }
+          }
+          throw new Error(errorMsg);
+        }
+        
+        // Store user data
+        const userData = {
+          email: data.user?.email || email,
+          name: data.user?.full_name || name,
+          full_name: data.user?.full_name || name,
+          plan: 'Free',
+          role: data.user?.role || 'user',
+          loggedInAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('userEmail', userData.email);
+        localStorage.setItem('userName', userData.name);
+        
+        // Store tokens if provided
+        if (data.access_token) {
+          localStorage.setItem('scamshield_access_token', data.access_token);
+        } else if (data.tokens?.access_token) {
+          localStorage.setItem('scamshield_access_token', data.tokens.access_token);
+        } else {
+          // Set a demo access token for demo mode
+          localStorage.setItem('scamshield_access_token', 'demo_token_' + Date.now());
+        }
+        if (data.refresh_token) {
+          localStorage.setItem('scamshield_refresh_token', data.refresh_token);
+        } else if (data.tokens?.refresh_token) {
+          localStorage.setItem('scamshield_refresh_token', data.tokens.refresh_token);
+        }
+        
+        localStorage.setItem('scamshield_user', JSON.stringify(userData));
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Set the verification email display
+        document.getElementById('verificationEmail').textContent = email;
+        
+        // Show success step
+        nextStep(3);
+        showToast('Account created! Please check your email to verify.', 'success');
+        
+      } catch (error) {
+        console.error('Registration error:', error);
+        showToast(error.message || 'Failed to create account. Please try again.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+    
+    // Continue to dashboard function
+    document.getElementById('continueBtn')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = './dashboard.html';
+    });
+    
+    // Resend verification email function
+    async function resendVerificationEmail() {
+      const email = document.getElementById('email').value.trim() || document.getElementById('verificationEmail').textContent;
+      
+      if (!email) {
+        showToast('Email not found', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('http://localhost:8001/api/v1/auth/resend-verification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showToast('Verification email sent! Check your inbox.', 'success');
+        } else {
+          showToast(data.detail || 'Failed to resend email', 'error');
+        }
+      } catch (error) {
+        console.error('Resend error:', error);
+        showToast('Failed to resend verification email', 'error');
+      }
+    }
+    
+    // Password strength indicator
+    document.getElementById('password')?.addEventListener('input', function(e) {
+      const password = e.target.value;
+      const strengthBar = document.getElementById('passwordStrength');
+      const strengthText = document.getElementById('strengthText');
+      
+      if (!strengthBar || !strengthText) return;
+      
+      // Calculate strength
+      let strength = 0;
+      if (password.length >= 8) strength += 25;
+      if (password.length >= 12) strength += 10;
+      if (/[A-Z]/.test(password)) strength += 20;
+      if (/[a-z]/.test(password)) strength += 15;
+      if (/[0-9]/.test(password)) strength += 15;
+      if (/[^A-Za-z0-9]/.test(password)) strength += 15;
+      
+      // Update UI
+      strengthBar.style.width = strength + '%';
+      
+      if (strength < 30) {
+        strengthBar.style.background = '#ef4444';
+        strengthText.textContent = 'Weak';
+      } else if (strength < 60) {
+        strengthBar.style.background = '#f59e0b';
+        strengthText.textContent = 'Fair';
+      } else if (strength < 80) {
+        strengthBar.style.background = '#10b981';
+        strengthText.textContent = 'Good';
+      } else {
+        strengthBar.style.background = '#059669';
+        strengthText.textContent = 'Strong';
+      }
+    });
+  </script>
+</body>
+</html>

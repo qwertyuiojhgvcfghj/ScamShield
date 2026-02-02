@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - ScamShield</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <style>
+        .verification-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 20px;
+        }
+        
+        .verification-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .verification-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+        
+        .verification-icon.loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .verification-icon.success {
+            color: #10b981;
+        }
+        
+        .verification-icon.error {
+            color: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.95); }
+        }
+        
+        .verification-title {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 12px;
+        }
+        
+        .verification-message {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .email-display {
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-family: monospace;
+            color: #a5b4fc;
+        }
+        
+        .countdown {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-container">
+        <div class="verification-box">
+            <div id="loadingState">
+                <div class="verification-icon loading">⏳</div>
+                <h1 class="verification-title">Verifying your email...</h1>
+                <p class="verification-message">Please wait while we verify your email address.</p>
+            </div>
+            
+            <div id="successState" style="display: none;">
+                <div class="verification-icon success">✅</div>
+                <h1 class="verification-title">Email Verified!</h1>
+                <p class="verification-message">Your email has been verified successfully. You can now access all features of ScamShield.</p>
+                <div id="emailDisplay" class="email-display"></div>
+                <a href="login.html" class="btn-primary">Continue to Login</a>
+                <p class="countdown">Redirecting in <span id="countdown">5</span> seconds...</p>
+            </div>
+            
+            <div id="errorState" style="display: none;">
+                <div class="verification-icon error">❌</div>
+                <h1 class="verification-title">Verification Failed</h1>
+                <p class="verification-message" id="errorMessage">The verification link is invalid or has expired.</p>
+                <a href="login.html" class="btn-primary">Go to Login</a>
+                <br>
+                <a href="#" class="btn-secondary" onclick="resendVerification()">Resend Verification Email</a>
+            </div>
+            
+            <div id="resendState" style="display: none;">
+                <div class="verification-icon success">📧</div>
+                <h1 class="verification-title">Email Sent!</h1>
+                <p class="verification-message">A new verification link has been sent to your email address.</p>
+                <a href="login.html" class="btn-primary">Go to Login</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/api.js"></script>
+    <script>
+        const API_URL = 'http://localhost:8001/api/v1';
+        
+        // Show state helper
+        function showState(stateId) {
+            ['loadingState', 'successState', 'errorState', 'resendState'].forEach(id => {
+                document.getElementById(id).style.display = id === stateId ? 'block' : 'none';
+            });
+        }
+        
+        // Get token from URL
+        function getTokenFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('token');
+        }
+        
+        // Verify email with token
+        async function verifyEmail(token) {
+            try {
+                const response = await fetch(`${API_URL}/auth/verify-email/${token}`);
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    showState('successState');
+                    document.getElementById('emailDisplay').textContent = data.email;
+                    startCountdown();
+                } else {
+                    showState('errorState');
+                    document.getElementById('errorMessage').textContent = 
+                        data.detail || 'The verification link is invalid or has expired.';
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                showState('errorState');
+                document.getElementById('errorMessage').textContent = 
+                    'An error occurred while verifying your email. Please try again.';
+            }
+        }
+        
+        // Countdown and redirect
+        function startCountdown() {
+            let seconds = 5;
+            const countdownEl = document.getElementById('countdown');
+            
+            const interval = setInterval(() => {
+                seconds--;
+                countdownEl.textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    window.location.href = 'login.html';
+                }
+            }, 1000);
+        }
+        
+        // Resend verification email
+        async function resendVerification() {
+            const email = prompt('Enter your email address:');
+            if (!email) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/resend-verification`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showState('resendState');
+                } else {
+                    alert(data.detail || 'Failed to resend verification email.');
+                }
+            } catch (error) {
+                console.error('Resend error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = getTokenFromUrl();
+            
+            if (!token) {
+                showState('errorState');
+                document.getElementById('errorMessage').textContent = 
+                    'No verification token provided. Please check your email for the verification link.';
+                return;
+            }
+            
+            verifyEmail(token);
+        });
+    </script>
+</body>
+</html>

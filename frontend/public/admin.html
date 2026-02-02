@@ -1,0 +1,4298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — ScamShield Pro</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/pages.css">
+  <style>
+    /* Admin Panel Specific Styles */
+    :root {
+      --admin-accent: #C41E3A;
+      --admin-bg: #0A0A0A;
+      --admin-surface: #111111;
+      --admin-border: #222222;
+      --cream: #F5F2EB;
+    }
+
+    body {
+      background: var(--admin-bg);
+      color: var(--cream);
+      min-height: 100vh;
+    }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .admin-sidebar {
+      width: 260px;
+      background: var(--admin-surface);
+      border-right: 1px solid var(--admin-border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--cream);
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--admin-accent), #8B0000);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--cream);
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .logo-text span {
+      color: var(--admin-accent);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(245,242,235,0.4);
+      padding: 0 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      color: rgba(245,242,235,0.7);
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-link:hover {
+      background: rgba(196,30,58,0.1);
+      color: var(--cream);
+    }
+
+    .nav-link.active {
+      background: rgba(196,30,58,0.15);
+      color: var(--admin-accent);
+      border-left-color: var(--admin-accent);
+    }
+
+    .nav-link svg {
+      width: 20px;
+      height: 20px;
+      opacity: 0.7;
+    }
+
+    .nav-link.active svg {
+      opacity: 1;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--admin-accent);
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--admin-border);
+    }
+
+    .admin-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .admin-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--admin-accent), #8B0000);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+    }
+
+    .admin-info {
+      flex: 1;
+    }
+
+    .admin-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .admin-role {
+      font-size: 0.75rem;
+      color: var(--admin-accent);
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: rgba(245,242,235,0.5);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(196,30,58,0.2);
+      color: var(--admin-accent);
+    }
+
+    /* Main Content */
+    .admin-main {
+      flex: 1;
+      margin-left: 260px;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    .admin-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .admin-header p {
+      color: rgba(245,242,235,0.6);
+      margin: 0.25rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(27,94,32,0.15);
+      border: 1px solid rgba(27,94,32,0.3);
+      border-radius: 8px;
+      color: #4CAF50;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #4CAF50;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--admin-accent), transparent);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(196,30,58,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .stat-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--admin-accent);
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: rgba(245,242,235,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--cream);
+      font-family: var(--font-mono);
+    }
+
+    .stat-value.danger {
+      color: var(--admin-accent);
+    }
+
+    .stat-change {
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      color: rgba(245,242,235,0.5);
+    }
+
+    .stat-change.positive {
+      color: #4CAF50;
+    }
+
+    .stat-change.negative {
+      color: var(--admin-accent);
+    }
+
+    /* View Containers */
+    .admin-view {
+      display: none;
+    }
+
+    .admin-view.active {
+      display: block;
+    }
+
+    /* Cards */
+    .admin-card {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Tables */
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .admin-table th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(245,242,235,0.5);
+      border-bottom: 1px solid var(--admin-border);
+      font-weight: 500;
+    }
+
+    .admin-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--admin-border);
+      font-size: 0.9rem;
+    }
+
+    .admin-table tr:hover {
+      background: rgba(196,30,58,0.05);
+    }
+
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-success {
+      background: rgba(76,175,80,0.15);
+      color: #4CAF50;
+    }
+
+    .badge-warning {
+      background: rgba(255,152,0,0.15);
+      color: #FF9800;
+    }
+
+    .badge-danger {
+      background: rgba(196,30,58,0.15);
+      color: var(--admin-accent);
+    }
+
+    .badge-info {
+      background: rgba(33,150,243,0.15);
+      color: #2196F3;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--admin-accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #a01830;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--admin-border);
+      color: var(--cream);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--admin-accent);
+      color: var(--admin-accent);
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-warning {
+      background: #FF9800;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #e68900;
+    }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    /* User Avatar */
+    .user-avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .user-info-sm {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-info-sm .name {
+      font-weight: 500;
+    }
+
+    .user-info-sm .email {
+      font-size: 0.8rem;
+      color: rgba(245,242,235,0.5);
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    /* Activity List */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .activity-icon.users {
+      background: rgba(33,150,243,0.15);
+      color: #2196F3;
+    }
+
+    .activity-icon.threats {
+      background: rgba(196,30,58,0.15);
+      color: var(--admin-accent);
+    }
+
+    .activity-icon.api {
+      background: rgba(156,39,176,0.15);
+      color: #9C27B0;
+    }
+
+    .activity-icon.system {
+      background: rgba(76,175,80,0.15);
+      color: #4CAF50;
+    }
+
+    .activity-content {
+      flex: 1;
+    }
+
+    .activity-title {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .activity-meta {
+      font-size: 0.8rem;
+      color: rgba(245,242,235,0.5);
+    }
+
+    /* Alerts */
+    .alert-item {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      border-left: 4px solid;
+    }
+
+    .alert-item.danger {
+      background: rgba(196,30,58,0.1);
+      border-color: var(--admin-accent);
+    }
+
+    .alert-item.warning {
+      background: rgba(255,152,0,0.1);
+      border-color: #FF9800;
+    }
+
+    .alert-item.success {
+      background: rgba(76,175,80,0.1);
+      border-color: #4CAF50;
+    }
+
+    .alert-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .alert-message {
+      font-size: 0.85rem;
+      color: rgba(245,242,235,0.7);
+      margin-bottom: 0.5rem;
+    }
+
+    .alert-time {
+      font-size: 0.75rem;
+      color: rgba(245,242,235,0.4);
+      font-family: var(--font-mono);
+    }
+
+    /* Provider Status */
+    .provider-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .provider-card {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--admin-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .provider-name {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .provider-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .provider-metrics {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.8rem;
+      color: rgba(245,242,235,0.6);
+    }
+
+    .provider-metric strong {
+      display: block;
+      color: var(--cream);
+      font-size: 1rem;
+    }
+
+    /* Filters */
+    .filters-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-input {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      color: var(--cream);
+      font-size: 0.9rem;
+      min-width: 200px;
+    }
+
+    .filter-input::placeholder {
+      color: rgba(245,242,235,0.4);
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+    }
+
+    .filter-select {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      color: var(--cream);
+      font-size: 0.9rem;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--admin-border);
+    }
+
+    .pagination-info {
+      font-size: 0.85rem;
+      color: rgba(245,242,235,0.6);
+    }
+
+    .pagination-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    .modal-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: rgba(245,242,235,0.5);
+      cursor: pointer;
+      padding: 0.25rem;
+    }
+
+    .modal-close:hover {
+      color: var(--admin-accent);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--admin-border);
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: rgba(245,242,235,0.8);
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--admin-bg);
+      border: 1px solid var(--admin-border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      color: var(--cream);
+      font-size: 0.9rem;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+    }
+
+    /* Charts placeholder */
+    .chart-container {
+      height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      color: rgba(245,242,235,0.4);
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      color: rgba(245,242,235,0.5);
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--admin-border);
+      border-top-color: var(--admin-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 0.75rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Risk Score Bar */
+    .risk-bar {
+      height: 6px;
+      background: var(--admin-border);
+      border-radius: 3px;
+      overflow: hidden;
+      width: 80px;
+    }
+
+    .risk-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    .risk-fill.high { background: var(--admin-accent); }
+    .risk-fill.medium { background: #FF9800; }
+    .risk-fill.low { background: #4CAF50; }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: rgba(245,242,235,0.5);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+
+    .empty-state h3 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: rgba(245,242,235,0.7);
+    }
+
+    /* Mobile Admin Header */
+    .mobile-admin-header {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--admin-surface);
+      border-bottom: 1px solid var(--admin-border);
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 999;
+    }
+    
+    .mobile-admin-header .sidebar-logo {
+      gap: 10px;
+    }
+    
+    .mobile-admin-header .logo-icon {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .mobile-admin-header .logo-text {
+      font-size: 1.1rem;
+    }
+    
+    .admin-menu-toggle {
+      display: flex;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--admin-border);
+      border-radius: 10px;
+      color: var(--cream);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    
+    .admin-menu-toggle:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .admin-menu-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+    
+    /* Admin sidebar overlay */
+    .admin-sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 99;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Responsive - Tablet */
+    @media (max-width: 1200px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .provider-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Responsive - Mobile */
+    @media (max-width: 768px) {
+      .mobile-admin-header {
+        display: flex;
+      }
+      
+      .admin-sidebar-overlay.active {
+        display: block;
+      }
+      
+      .admin-sidebar {
+        width: 280px;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1001;
+        box-shadow: none;
+      }
+      
+      .admin-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.4);
+      }
+      
+      .admin-main {
+        margin-left: 0;
+        padding: 16px;
+        padding-top: calc(60px + 16px);
+        padding-bottom: 80px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      /* Cards mobile */
+      .card {
+        padding: 16px;
+        border-radius: 16px;
+      }
+      
+      .card-header {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+      
+      .card-title {
+        font-size: 1.1rem;
+      }
+      
+      /* Stat cards mobile */
+      .stat-value {
+        font-size: 1.75rem;
+      }
+      
+      .stat-label {
+        font-size: 0.75rem;
+      }
+      
+      /* Tables mobile */
+      .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -16px;
+        padding: 0 16px;
+      }
+      
+      .data-table {
+        font-size: 0.8rem;
+        min-width: 600px;
+      }
+      
+      .data-table th,
+      .data-table td {
+        padding: 10px 8px;
+      }
+      
+      /* Provider grid mobile */
+      .provider-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .provider-card {
+        padding: 16px;
+        border-radius: 14px;
+      }
+      
+      /* Form elements mobile */
+      .form-input,
+      .form-select,
+      input[type="text"],
+      input[type="email"],
+      input[type="password"],
+      textarea,
+      select {
+        font-size: 16px !important;
+        padding: 14px 16px;
+        border-radius: 12px;
+      }
+      
+      /* Section headers mobile */
+      .section-title {
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+      }
+      
+      /* Buttons mobile */
+      .btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+        min-height: 44px;
+      }
+      
+      .btn-sm {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        min-height: 36px;
+      }
+      
+      /* Sidebar mobile styles */
+      .sidebar-header {
+        padding: 16px;
+      }
+      
+      .sidebar-nav {
+        padding: 12px;
+      }
+      
+      .nav-link {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        border-radius: 10px;
+        min-height: 48px;
+      }
+      
+      .nav-link svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+    
+    /* Small mobile */
+    @media (max-width: 480px) {
+      .mobile-admin-header {
+        height: 56px;
+        padding: 0 12px;
+      }
+      
+      .mobile-admin-header .logo-icon {
+        width: 32px;
+        height: 32px;
+      }
+      
+      .mobile-admin-header .logo-text {
+        font-size: 1rem;
+      }
+      
+      .admin-menu-toggle {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .admin-main {
+        padding: 12px;
+        padding-top: calc(56px + 12px);
+      }
+      
+      .card {
+        padding: 14px;
+        border-radius: 14px;
+      }
+      
+      .stat-value {
+        font-size: 1.5rem;
+      }
+      
+      .data-table {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Mobile Admin Header -->
+  <header class="mobile-admin-header">
+    <button class="admin-menu-toggle" id="adminMenuToggle" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <a href="./index.html" class="sidebar-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <path d="M12 3L4 7v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V7l-8-4z"/>
+        </svg>
+      </div>
+      <span class="logo-text">Scam<span>Shield</span></span>
+    </a>
+    <div style="width: 44px;"></div>
+  </header>
+  
+  <!-- Admin Sidebar Overlay -->
+  <div class="admin-sidebar-overlay" id="adminSidebarOverlay"></div>
+  
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="./index.html" class="sidebar-logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M12 3L4 7v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V7l-8-4z"/>
+            </svg>
+          </div>
+          <span class="logo-text">Scam<span>Shield</span></span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-section-title">Admin</span>
+          <a class="nav-link active" onclick="showView('overview')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            Overview
+          </a>
+          <a class="nav-link" onclick="showView('users')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+              <path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+            Users
+            <span class="nav-badge" id="users-count">0</span>
+          </a>
+          <a class="nav-link" onclick="showView('threats')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            Threats
+          </a>
+          <a class="nav-link" onclick="showView('sessions')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+            Sessions
+          </a>
+          <a class="nav-link" onclick="showView('scammers')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+            </svg>
+            Scammers
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-section-title">System</span>
+          <a class="nav-link" onclick="showView('providers')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            AI Providers
+          </a>
+          <a class="nav-link" onclick="showView('logs')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            System Logs
+          </a>
+          <a class="nav-link" onclick="showView('settings')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+            </svg>
+            Settings
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-user">
+          <div class="admin-avatar" id="admin-avatar">A</div>
+          <div class="admin-info">
+            <div class="admin-name" id="admin-name">Admin</div>
+            <div class="admin-role">Administrator</div>
+          </div>
+          <button class="logout-btn" onclick="logout()" title="Log out">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <!-- Overview View -->
+      <div class="admin-view active" id="view-overview">
+        <div class="admin-header">
+          <div>
+            <h1>Admin Dashboard</h1>
+            <p>System overview and management controls</p>
+          </div>
+          <div class="header-actions">
+            <div class="system-status">
+              <span class="status-dot"></span>
+              All Systems Operational
+            </div>
+            <button class="btn btn-outline" onclick="refreshMetrics()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+              </svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+            </div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value" id="stat-users">—</div>
+            <div class="stat-change positive" id="stat-users-change">Loading...</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="stat-label">Active Sessions</div>
+            <div class="stat-value" id="stat-sessions">—</div>
+            <div class="stat-change" id="stat-sessions-change">current</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+            </div>
+            <div class="stat-label">API Calls Today</div>
+            <div class="stat-value" id="stat-api">—</div>
+            <div class="stat-change positive" id="stat-api-change">Loading...</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div class="stat-label">Threats Detected</div>
+            <div class="stat-value danger" id="stat-threats">—</div>
+            <div class="stat-change" id="stat-threats-change">last 24h</div>
+          </div>
+        </div>
+
+        <!-- AI Provider Status -->
+        <div class="admin-card">
+          <div class="card-header">
+            <h3 class="card-title">AI Provider Status</h3>
+            <button class="btn btn-sm btn-outline" onclick="refreshProviders()">Refresh</button>
+          </div>
+          <div class="card-body">
+            <div class="provider-grid" id="providers-grid">
+              <div class="provider-card">
+                <div class="provider-name">Groq</div>
+                <div class="provider-status">
+                  <span class="status-dot"></span>
+                  <span class="badge badge-success">Active</span>
+                </div>
+                <div class="provider-metrics">
+                  <div><strong>142ms</strong> Latency</div>
+                  <div><strong>24.8K</strong> Requests</div>
+                </div>
+              </div>
+              <div class="provider-card">
+                <div class="provider-name">DeepSeek</div>
+                <div class="provider-status">
+                  <span class="status-dot"></span>
+                  <span class="badge badge-success">Active</span>
+                </div>
+                <div class="provider-metrics">
+                  <div><strong>189ms</strong> Latency</div>
+                  <div><strong>18.2K</strong> Requests</div>
+                </div>
+              </div>
+              <div class="provider-card">
+                <div class="provider-name">Ollama</div>
+                <div class="provider-status">
+                  <span class="badge badge-warning">Standby</span>
+                </div>
+                <div class="provider-metrics">
+                  <div><strong>—</strong> Latency</div>
+                  <div><strong>0</strong> Requests</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid Section -->
+        <div class="grid-2">
+          <!-- Recent Activity -->
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">Recent Activity</h3>
+              <a href="#" onclick="showView('logs')" style="font-size:0.85rem;color:var(--admin-accent);text-decoration:none;">View all →</a>
+            </div>
+            <div class="card-body">
+              <div class="activity-list" id="recent-activity">
+                <div class="activity-item">
+                  <div class="activity-icon users">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                      <circle cx="8.5" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-title">New user registered</div>
+                    <div class="activity-meta">john@example.com — 5 min ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon threats">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 9v2m0 4h.01"/>
+                      <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    </svg>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-title">Phishing attempt blocked</div>
+                    <div class="activity-meta">High confidence detection — 12 min ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon api">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-title">API key created</div>
+                    <div class="activity-meta">user@company.com — 23 min ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon system">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-title">System health check passed</div>
+                    <div class="activity-meta">All services operational — 1 hour ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Alerts -->
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">System Alerts</h3>
+              <span class="badge badge-warning" id="alerts-count">3 Active</span>
+            </div>
+            <div class="card-body" id="system-alerts">
+              <div class="alert-item danger">
+                <div class="alert-title" style="color:var(--admin-accent);">High API Usage</div>
+                <div class="alert-message">API calls approaching 80% of daily limit. Consider upgrading plan.</div>
+                <div class="alert-time">2 min ago</div>
+              </div>
+              <div class="alert-item warning">
+                <div class="alert-title" style="color:#FF9800;">Maintenance Scheduled</div>
+                <div class="alert-message">System maintenance planned for Sunday 2 AM UTC.</div>
+                <div class="alert-time">1 hour ago</div>
+              </div>
+              <div class="alert-item success">
+                <div class="alert-title" style="color:#4CAF50;">Model Updated</div>
+                <div class="alert-message">Scam detection model v3.5 deployed successfully.</div>
+                <div class="alert-time">3 hours ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users View -->
+      <div class="admin-view" id="view-users">
+        <div class="admin-header">
+          <div>
+            <h1>User Management</h1>
+            <p>Manage all registered users</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportUsers()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Export
+            </button>
+            <button class="btn btn-primary" onclick="showAddUserModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add User
+            </button>
+          </div>
+        </div>
+
+        <div class="filters-row">
+          <input type="text" class="filter-input" id="user-search" placeholder="Search by email..." onkeyup="searchUsers()">
+          <select class="filter-select" id="user-role-filter" onchange="filterUsers()">
+            <option value="">All Roles</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+          <select class="filter-select" id="user-status-filter" onchange="filterUsers()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="admin-card">
+          <div class="card-body" style="padding:0;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Verified</th>
+                  <th>Joined</th>
+                  <th>Last Login</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr>
+                  <td colspan="7" class="loading">
+                    <div class="spinner"></div>
+                    Loading users...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="pagination-info" id="users-pagination-info">Showing 0 of 0 users</div>
+            <div class="pagination-buttons">
+              <button class="btn btn-sm btn-outline" id="users-prev" onclick="prevUsersPage()" disabled>Previous</button>
+              <button class="btn btn-sm btn-outline" id="users-next" onclick="nextUsersPage()">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threats View -->
+      <div class="admin-view" id="view-threats">
+        <div class="admin-header">
+          <div>
+            <h1>Threat Detection</h1>
+            <p>Monitor and manage detected threats</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="refreshThreats()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+              </svg>
+              Refresh
+            </button>
+            <button class="btn btn-outline" onclick="exportThreats()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Export
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.5rem;">
+          <div class="stat-card">
+            <div class="stat-label">Total Blocked</div>
+            <div class="stat-value danger" id="threats-total">1,247</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Today</div>
+            <div class="stat-value" id="threats-today">23</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">This Week</div>
+            <div class="stat-value" id="threats-week">156</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Success Rate</div>
+            <div class="stat-value" style="color:#4CAF50;" id="threats-success">98.4%</div>
+          </div>
+        </div>
+
+        <div class="filters-row">
+          <select class="filter-select" id="threat-type-filter" onchange="filterThreats()">
+            <option value="">All Types</option>
+            <option value="phishing">Phishing</option>
+            <option value="tech_support">Tech Support</option>
+            <option value="banking">Banking</option>
+            <option value="lottery">Lottery</option>
+            <option value="romance">Romance</option>
+            <option value="investment">Investment</option>
+          </select>
+          <select class="filter-select" id="threat-severity-filter" onchange="filterThreats()">
+            <option value="">All Severity</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <select class="filter-select" id="threat-status-filter" onchange="filterThreats()">
+            <option value="">All Status</option>
+            <option value="blocked">Blocked</option>
+            <option value="allowed">Allowed</option>
+            <option value="pending">Pending Review</option>
+          </select>
+        </div>
+
+        <div class="admin-card">
+          <div class="card-header">
+            <h3 class="card-title">Recent Threats</h3>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <button class="btn btn-sm btn-outline" onclick="bulkBlockThreats()">Block Selected</button>
+              <button class="btn btn-sm btn-outline" onclick="bulkAllowThreats()">Allow Selected</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="select-all-threats" onchange="toggleAllThreats(this)" style="width:16px;height:16px;"></th>
+                  <th>Time</th>
+                  <th>Type</th>
+                  <th>Source</th>
+                  <th>Confidence</th>
+                  <th>Severity</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="threats-table-body">
+                <!-- Dynamic content -->
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="pagination-info" id="threats-pagination-info">Showing 1-20 of 156 threats</div>
+            <div class="pagination-buttons">
+              <button class="btn btn-sm btn-outline" id="threats-prev" onclick="prevThreatsPage()" disabled>Previous</button>
+              <button class="btn btn-sm btn-outline" id="threats-next" onclick="nextThreatsPage()">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:1.5rem;">
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">Threat Distribution</h3>
+            </div>
+            <div class="card-body" id="threat-distribution">
+              <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                <div style="display:flex;align-items:center;gap:1rem;">
+                  <span style="width:100px;font-size:0.85rem;">Phishing</span>
+                  <div style="flex:1;height:24px;background:rgba(196,30,58,0.2);border-radius:4px;overflow:hidden;">
+                    <div style="width:45%;height:100%;background:var(--admin-accent);"></div>
+                  </div>
+                  <span style="font-size:0.85rem;width:40px;text-align:right;">45%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:1rem;">
+                  <span style="width:100px;font-size:0.85rem;">Tech Support</span>
+                  <div style="flex:1;height:24px;background:rgba(255,152,0,0.2);border-radius:4px;overflow:hidden;">
+                    <div style="width:28%;height:100%;background:#FF9800;"></div>
+                  </div>
+                  <span style="font-size:0.85rem;width:40px;text-align:right;">28%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:1rem;">
+                  <span style="width:100px;font-size:0.85rem;">Banking</span>
+                  <div style="flex:1;height:24px;background:rgba(33,150,243,0.2);border-radius:4px;overflow:hidden;">
+                    <div style="width:15%;height:100%;background:#2196F3;"></div>
+                  </div>
+                  <span style="font-size:0.85rem;width:40px;text-align:right;">15%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:1rem;">
+                  <span style="width:100px;font-size:0.85rem;">Investment</span>
+                  <div style="flex:1;height:24px;background:rgba(156,39,176,0.2);border-radius:4px;overflow:hidden;">
+                    <div style="width:8%;height:100%;background:#9C27B0;"></div>
+                  </div>
+                  <span style="font-size:0.85rem;width:40px;text-align:right;">8%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:1rem;">
+                  <span style="width:100px;font-size:0.85rem;">Other</span>
+                  <div style="flex:1;height:24px;background:rgba(158,158,158,0.2);border-radius:4px;overflow:hidden;">
+                    <div style="width:4%;height:100%;background:#9E9E9E;"></div>
+                  </div>
+                  <span style="font-size:0.85rem;width:40px;text-align:right;">4%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">Threat Timeline (24h)</h3>
+            </div>
+            <div class="card-body" id="threat-timeline">
+              <div style="display:flex;align-items:flex-end;gap:4px;height:120px;">
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:40%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:55%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:30%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:45%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:70%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:85%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:60%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:90%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:75%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:100%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:65%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:50%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:35%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:25%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:40%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:55%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:48%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:62%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:78%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:55%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:42%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:38%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:28%;"></div>
+                <div style="flex:1;background:var(--admin-accent);border-radius:2px 2px 0 0;height:20%;"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:0.5rem;font-size:0.7rem;color:rgba(245,242,235,0.5);">
+                <span>00:00</span>
+                <span>06:00</span>
+                <span>12:00</span>
+                <span>18:00</span>
+                <span>Now</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sessions View -->
+      <div class="admin-view" id="view-sessions">
+        <div class="admin-header">
+          <div>
+            <h1>Honeypot Sessions</h1>
+            <p>View all scam engagement sessions</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportSessions()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Export All
+            </button>
+            <button class="btn btn-danger" onclick="terminateAllActiveSessions()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              Terminate Active
+            </button>
+          </div>
+        </div>
+
+        <div class="filters-row">
+          <select class="filter-select" id="session-status-filter" onchange="filterSessions()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="closed">Closed</option>
+            <option value="escalated">Escalated</option>
+          </select>
+        </div>
+
+        <div class="admin-card">
+          <div class="card-body" style="padding:0;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Session ID</th>
+                  <th>Scam Type</th>
+                  <th>Confidence</th>
+                  <th>Messages</th>
+                  <th>Intel</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sessions-table-body">
+                <tr>
+                  <td colspan="8" class="loading">
+                    <div class="spinner"></div>
+                    Loading sessions...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="pagination-info" id="sessions-pagination-info">Showing 0 of 0 sessions</div>
+            <div class="pagination-buttons">
+              <button class="btn btn-sm btn-outline" id="sessions-prev" onclick="prevSessionsPage()" disabled>Previous</button>
+              <button class="btn btn-sm btn-outline" id="sessions-next" onclick="nextSessionsPage()">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scammers View -->
+      <div class="admin-view" id="view-scammers">
+        <div class="admin-header">
+          <div>
+            <h1>Known Scammers</h1>
+            <p>Database of identified scammer fingerprints</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportScammers()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Export Database
+            </button>
+            <button class="btn btn-primary" onclick="addToBlocklist()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add to Blocklist
+            </button>
+          </div>
+        </div>
+
+        <div class="filters-row">
+          <input type="range" min="0" max="100" value="0" class="filter-input" style="width:150px;" id="risk-filter" oninput="updateRiskLabel(this.value)" onchange="filterScammers()">
+          <span id="risk-label" style="font-size:0.85rem;">Min Risk: 0%</span>
+        </div>
+
+        <div class="admin-card">
+          <div class="card-body" style="padding:0;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Fingerprint</th>
+                  <th>Phones</th>
+                  <th>Emails</th>
+                  <th>Sessions</th>
+                  <th>Risk Score</th>
+                  <th>Threat Level</th>
+                  <th>First Seen</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="scammers-table-body">
+                <tr>
+                  <td colspan="8" class="loading">
+                    <div class="spinner"></div>
+                    Loading scammers...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="pagination-info" id="scammers-pagination-info">Showing 0 of 0 scammers</div>
+            <div class="pagination-buttons">
+              <button class="btn btn-sm btn-outline" id="scammers-prev" onclick="prevScammersPage()" disabled>Previous</button>
+              <button class="btn btn-sm btn-outline" id="scammers-next" onclick="nextScammersPage()">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Providers View -->
+      <div class="admin-view" id="view-providers">
+        <div class="admin-header">
+          <div>
+            <h1>AI Providers</h1>
+            <p>Configure and monitor AI model providers</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="testAllProviders()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              Test All
+            </button>
+            <button class="btn btn-primary" onclick="showAddProviderModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Provider
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-3" id="providers-container">
+          <div class="admin-card" id="provider-groq">
+            <div class="card-header">
+              <h3 class="card-title">Groq</h3>
+              <span class="badge badge-success" id="groq-role">Primary</span>
+            </div>
+            <div class="card-body">
+              <div style="margin-bottom:1rem;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Status</span>
+                  <span class="badge badge-success" id="groq-status">Active</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Model</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="groq-model">llama-3.3-70b</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Avg Latency</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="groq-latency">142ms</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span style="color:rgba(245,242,235,0.6);">24h Requests</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="groq-requests">24,847</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-outline" style="flex:1;" onclick="testProvider('groq')">Test</button>
+                <button class="btn btn-outline" style="flex:1;" onclick="configureProvider('groq')">Configure</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-card" id="provider-deepseek">
+            <div class="card-header">
+              <h3 class="card-title">DeepSeek</h3>
+              <span class="badge badge-info" id="deepseek-role">Fallback</span>
+            </div>
+            <div class="card-body">
+              <div style="margin-bottom:1rem;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Status</span>
+                  <span class="badge badge-success" id="deepseek-status">Active</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Model</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="deepseek-model">deepseek-chat</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Avg Latency</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="deepseek-latency">189ms</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span style="color:rgba(245,242,235,0.6);">24h Requests</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="deepseek-requests">18,234</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-outline" style="flex:1;" onclick="testProvider('deepseek')">Test</button>
+                <button class="btn btn-outline" style="flex:1;" onclick="configureProvider('deepseek')">Configure</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-card" id="provider-ollama">
+            <div class="card-header">
+              <h3 class="card-title">Ollama</h3>
+              <span class="badge badge-warning" id="ollama-role">Local</span>
+            </div>
+            <div class="card-body">
+              <div style="margin-bottom:1rem;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Status</span>
+                  <span class="badge badge-warning" id="ollama-status">Standby</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Model</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="ollama-model">—</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                  <span style="color:rgba(245,242,235,0.6);">Avg Latency</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="ollama-latency">—</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span style="color:rgba(245,242,235,0.6);">24h Requests</span>
+                  <span style="font-family:var(--font-mono);font-size:0.85rem;" id="ollama-requests">0</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-primary" style="flex:1;" id="ollama-toggle-btn" onclick="toggleOllama()">Start</button>
+                <button class="btn btn-outline" style="flex:1;" onclick="configureProvider('ollama')">Configure</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logs View -->
+      <div class="admin-view" id="view-logs">
+        <div class="admin-header">
+          <div>
+            <h1>System Logs</h1>
+            <p>View system activity and error logs</p>
+          </div>
+          <div class="header-actions">
+            <select class="filter-select" id="log-level-filter" onchange="filterLogs()" style="background:var(--admin-surface);color:var(--cream);border-color:var(--admin-border);">
+              <option value="">All Levels</option>
+              <option value="INFO">INFO</option>
+              <option value="WARN">WARN</option>
+              <option value="ERROR">ERROR</option>
+              <option value="DEBUG">DEBUG</option>
+            </select>
+            <button class="btn btn-outline" onclick="refreshLogs()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+              </svg>
+              Refresh
+            </button>
+            <button class="btn btn-outline" onclick="clearLogs()">Clear Logs</button>
+            <button class="btn btn-outline" onclick="exportLogs()">Export</button>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:1rem;">
+              <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                <input type="checkbox" id="auto-refresh-logs" onchange="toggleAutoRefresh()" style="width:16px;height:16px;">
+                <span style="font-size:0.85rem;">Auto-refresh</span>
+              </label>
+              <span id="logs-last-updated" style="font-size:0.75rem;color:rgba(245,242,235,0.5);">Last updated: just now</span>
+            </div>
+            <span id="logs-count" style="font-size:0.85rem;color:rgba(245,242,235,0.6);">0 entries</span>
+          </div>
+          <div class="card-body" style="background:#000;border-radius:8px;font-family:var(--font-mono);font-size:0.8rem;max-height:500px;overflow-y:auto;">
+            <pre id="logs-content" style="margin:0;"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings View -->
+      <div class="admin-view" id="view-settings">
+        <div class="admin-header">
+          <div>
+            <h1>System Settings</h1>
+            <p>Configure system-wide settings</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="resetAllSettings()">Reset to Defaults</button>
+            <button class="btn btn-primary" onclick="saveAllSettings()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              Save All
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">General Settings</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Site Name</label>
+                <input type="text" class="form-control" id="setting-site-name" value="ScamShield Pro">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Support Email</label>
+                <input type="email" class="form-control" id="setting-support-email" value="support@scamshield.pro">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Timezone</label>
+                <select class="form-control" id="setting-timezone">
+                  <option value="UTC">UTC</option>
+                  <option value="America/New_York">America/New_York</option>
+                  <option value="Europe/London">Europe/London</option>
+                  <option value="Asia/Kolkata" selected>Asia/Kolkata</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings('general')">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">Security Settings</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Session Timeout (minutes)</label>
+                <input type="number" class="form-control" id="setting-session-timeout" value="30" min="5" max="1440">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Max Login Attempts</label>
+                <input type="number" class="form-control" id="setting-max-attempts" value="5" min="1" max="20">
+              </div>
+              <div class="form-group">
+                <label class="form-label">2FA Requirement</label>
+                <select class="form-control" id="setting-2fa">
+                  <option value="disabled">Disabled</option>
+                  <option value="optional">Optional</option>
+                  <option value="admin" selected>Required for Admins</option>
+                  <option value="all">Required for All</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings('security')">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">API Settings</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Rate Limit (requests/min)</label>
+                <input type="number" class="form-control" id="setting-rate-limit" value="100" min="10" max="10000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Default Quota (requests/day)</label>
+                <input type="number" class="form-control" id="setting-quota" value="1000" min="100" max="1000000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Webhook Timeout (seconds)</label>
+                <input type="number" class="form-control" id="setting-webhook-timeout" value="30" min="5" max="120">
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings('api')">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">Notification Settings</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;">
+                <label class="form-label" style="margin:0;">Email notifications</label>
+                <input type="checkbox" id="setting-email-notif" checked style="width:20px;height:20px;">
+              </div>
+              <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;">
+                <label class="form-label" style="margin:0;">Threat alerts</label>
+                <input type="checkbox" id="setting-threat-alerts" checked style="width:20px;height:20px;">
+              </div>
+              <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;">
+                <label class="form-label" style="margin:0;">Weekly reports</label>
+                <input type="checkbox" id="setting-weekly-reports" checked style="width:20px;height:20px;">
+              </div>
+              <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;">
+                <label class="form-label" style="margin:0;">System alerts</label>
+                <input type="checkbox" id="setting-system-alerts" checked style="width:20px;height:20px;">
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings('notifications')">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">AI Detection Settings</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Detection Confidence Threshold</label>
+                <input type="range" class="form-control" id="setting-confidence" min="50" max="99" value="75" oninput="updateConfidenceLabel(this.value)" style="padding:0;">
+                <span id="confidence-label" style="font-size:0.85rem;color:rgba(245,242,235,0.6);">75%</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Auto-block High Risk</label>
+                <select class="form-control" id="setting-autoblock">
+                  <option value="disabled">Disabled</option>
+                  <option value="90" selected>Score > 90%</option>
+                  <option value="80">Score > 80%</option>
+                  <option value="70">Score > 70%</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Engagement Duration Limit (minutes)</label>
+                <input type="number" class="form-control" id="setting-engagement-limit" value="30" min="5" max="120">
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings('detection')">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="card-header">
+              <h3 class="card-title">Backup & Maintenance</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Last Backup</label>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                  <span id="last-backup-time" style="font-family:var(--font-mono);font-size:0.85rem;">2026-02-01 08:00:00</span>
+                  <span class="badge badge-success">Success</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Auto Backup</label>
+                <select class="form-control" id="setting-auto-backup">
+                  <option value="disabled">Disabled</option>
+                  <option value="daily" selected>Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+                <button class="btn btn-outline" style="flex:1;" onclick="createBackup()">Create Backup</button>
+                <button class="btn btn-outline" style="flex:1;" onclick="restoreBackup()">Restore</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- User Modal -->
+  <div class="modal-overlay" id="user-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="user-modal-title">User Details</span>
+        <button class="modal-close" onclick="closeUserModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="user-modal-body">
+        <!-- Dynamic content -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeUserModal()">Close</button>
+        <button class="btn btn-primary" id="user-modal-action">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Detail Modal -->
+  <div class="modal-overlay" id="session-modal">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <span class="modal-title">Session Details</span>
+        <button class="modal-close" onclick="closeSessionModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="session-modal-body" style="max-height:60vh;overflow-y:auto;">
+        <!-- Dynamic content -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeSessionModal()">Close</button>
+        <button class="btn btn-danger" id="terminate-session-btn" onclick="terminateCurrentSession()">Terminate Session</button>
+        <button class="btn btn-primary" onclick="exportSessionData()">Export Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scammer Detail Modal -->
+  <div class="modal-overlay" id="scammer-modal">
+    <div class="modal" style="max-width:600px;">
+      <div class="modal-header">
+        <span class="modal-title">Scammer Details</span>
+        <button class="modal-close" onclick="closeScammerModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="scammer-modal-body" style="max-height:60vh;overflow-y:auto;">
+        <!-- Dynamic content -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeScammerModal()">Close</button>
+        <button class="btn btn-danger" onclick="blockScammer()">Block Scammer</button>
+        <button class="btn btn-primary" onclick="exportScammerData()">Export Intel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Provider Config Modal -->
+  <div class="modal-overlay" id="provider-modal">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header">
+        <span class="modal-title" id="provider-modal-title">Configure Provider</span>
+        <button class="modal-close" onclick="closeProviderModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="provider-modal-body">
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <input type="password" class="form-control" id="provider-api-key" placeholder="Enter API key...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Model</label>
+          <select class="form-control" id="provider-model">
+            <option>Select model...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-control" id="provider-priority">
+            <option value="primary">Primary</option>
+            <option value="fallback">Fallback</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Temperature</label>
+          <input type="range" class="form-control" id="provider-temperature" min="0" max="100" value="70" style="padding:0;">
+          <span id="temp-value" style="font-size:0.85rem;">0.7</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Tokens</label>
+          <input type="number" class="form-control" id="provider-max-tokens" value="2048" min="256" max="8192">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeProviderModal()">Cancel</button>
+        <button class="btn btn-outline" onclick="testProviderConnection()">Test Connection</button>
+        <button class="btn btn-primary" onclick="saveProviderConfig()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Provider Modal -->
+  <div class="modal-overlay" id="add-provider-modal">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header">
+        <span class="modal-title">Add New Provider</span>
+        <button class="modal-close" onclick="closeAddProviderModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Provider Type</label>
+          <select class="form-control" id="new-provider-type" onchange="updateNewProviderForm()">
+            <option value="">Select provider...</option>
+            <option value="openai">OpenAI</option>
+            <option value="anthropic">Anthropic</option>
+            <option value="google">Google AI</option>
+            <option value="mistral">Mistral</option>
+            <option value="custom">Custom OpenAI-compatible</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Display Name</label>
+          <input type="text" class="form-control" id="new-provider-name" placeholder="My Custom Provider">
+        </div>
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <input type="password" class="form-control" id="new-provider-key" placeholder="Enter API key...">
+        </div>
+        <div class="form-group" id="custom-endpoint-group" style="display:none;">
+          <label class="form-label">API Endpoint</label>
+          <input type="url" class="form-control" id="new-provider-endpoint" placeholder="https://api.example.com/v1">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeAddProviderModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="addNewProvider()">Add Provider</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <span class="modal-title" id="confirm-title">Confirm Action</span>
+        <button class="modal-close" onclick="closeConfirmModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message">Are you sure you want to proceed?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeConfirmModal()">Cancel</button>
+        <button class="btn btn-danger" id="confirm-action-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Threat Detail Modal -->
+  <div class="modal-overlay" id="threat-modal">
+    <div class="modal" style="max-width:600px;">
+      <div class="modal-header">
+        <span class="modal-title">Threat Details</span>
+        <button class="modal-close" onclick="closeThreatModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="threat-modal-body">
+        <!-- Dynamic content -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeThreatModal()">Close</button>
+        <button class="btn btn-success" onclick="allowThreat()">Allow</button>
+        <button class="btn btn-danger" onclick="blockThreat()">Block</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Config
+    const API_BASE = 'http://localhost:8001/api/v1';
+    let accessToken = localStorage.getItem('scamshield_access_token');
+    let currentUser = null;
+    let demoMode = false;
+
+    // Pagination state
+    let usersPage = 1;
+    let sessionsPage = 1;
+    let scammersPage = 1;
+    let threatsPage = 1;
+    const PAGE_SIZE = 20;
+    
+    // Current item tracking
+    let currentSessionId = null;
+    let currentScammerId = null;
+    let currentThreatId = null;
+    let currentProviderId = null;
+    let confirmCallback = null;
+    let logsRefreshInterval = null;
+    
+    // Stored settings (simulated)
+    let systemSettings = {
+      general: { siteName: 'ScamShield Pro', supportEmail: 'support@scamshield.pro', timezone: 'Asia/Kolkata' },
+      security: { sessionTimeout: 30, maxAttempts: 5, twoFactor: 'admin' },
+      api: { rateLimit: 100, quota: 1000, webhookTimeout: 30 },
+      notifications: { email: true, threats: true, weekly: true, system: true },
+      detection: { confidence: 75, autoblock: '90', engagementLimit: 30 },
+      backup: { auto: 'daily' }
+    };
+    
+    // Demo logs data
+    const demoLogs = [
+      { time: '2026-02-01 11:42:15', level: 'INFO', message: 'System started successfully' },
+      { time: '2026-02-01 11:42:16', level: 'INFO', message: 'MongoDB connection established' },
+      { time: '2026-02-01 11:42:17', level: 'INFO', message: 'AI providers initialized (Groq: OK, DeepSeek: OK)' },
+      { time: '2026-02-01 11:43:22', level: 'INFO', message: 'New user registration: john@example.com' },
+      { time: '2026-02-01 11:45:33', level: 'WARN', message: 'Rate limit warning: API key sk_live_xxx approaching limit' },
+      { time: '2026-02-01 11:47:12', level: 'INFO', message: 'Scam detected: phishing (confidence: 0.94)' },
+      { time: '2026-02-01 11:48:55', level: 'INFO', message: 'Session created: sess_abc123' },
+      { time: '2026-02-01 11:52:18', level: 'INFO', message: 'Intel extracted: phone number +91-9876543210' },
+      { time: '2026-02-01 11:55:42', level: 'ERROR', message: 'Webhook delivery failed: https://example.com/webhook (timeout)' },
+      { time: '2026-02-01 11:56:01', level: 'INFO', message: 'Webhook retry scheduled' },
+      { time: '2026-02-01 12:02:33', level: 'INFO', message: 'API key generated for user@company.com' },
+      { time: '2026-02-01 12:15:47', level: 'INFO', message: 'Model v3.5 deployment completed' },
+      { time: '2026-02-01 12:22:19', level: 'INFO', message: 'Health check passed: all services operational' },
+      { time: '2026-02-01 12:30:05', level: 'DEBUG', message: 'Cache cleared for session analytics' },
+      { time: '2026-02-01 12:35:18', level: 'WARN', message: 'High memory usage detected: 78%' },
+    ];
+    
+    // Demo threats data
+    const demoThreats = [
+      { id: '1', time: '2026-02-01 12:30:00', type: 'phishing', source: '+91-9876543210', confidence: 0.94, severity: 'critical', status: 'blocked' },
+      { id: '2', time: '2026-02-01 12:25:00', type: 'tech_support', source: 'support@microsoft-help.fake', confidence: 0.89, severity: 'high', status: 'blocked' },
+      { id: '3', time: '2026-02-01 12:20:00', type: 'banking', source: '+1-555-BANK-NOW', confidence: 0.92, severity: 'critical', status: 'blocked' },
+      { id: '4', time: '2026-02-01 12:15:00', type: 'lottery', source: 'winner@lottery-prize.com', confidence: 0.78, severity: 'medium', status: 'pending' },
+      { id: '5', time: '2026-02-01 12:10:00', type: 'investment', source: '+44-20-7946-0958', confidence: 0.85, severity: 'high', status: 'blocked' },
+      { id: '6', time: '2026-02-01 12:05:00', type: 'phishing', source: 'security@paypa1.com', confidence: 0.97, severity: 'critical', status: 'blocked' },
+      { id: '7', time: '2026-02-01 12:00:00', type: 'romance', source: '+91-8765432109', confidence: 0.72, severity: 'medium', status: 'allowed' },
+      { id: '8', time: '2026-02-01 11:55:00', type: 'tech_support', source: '+1-800-WINDOWS', confidence: 0.91, severity: 'high', status: 'blocked' },
+    ];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      setupAdminMobileMenu();
+    });
+    
+    // Setup mobile menu for admin panel
+    function setupAdminMobileMenu() {
+      const menuToggle = document.getElementById('adminMenuToggle');
+      const sidebar = document.querySelector('.admin-sidebar');
+      const overlay = document.getElementById('adminSidebarOverlay');
+      
+      if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+          toggleAdminSidebar();
+        });
+      }
+      
+      if (overlay) {
+        overlay.addEventListener('click', () => {
+          closeAdminSidebar();
+        });
+      }
+      
+      // Close on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeAdminSidebar();
+        }
+      });
+      
+      // Close sidebar when clicking on nav links (mobile)
+      document.querySelectorAll('.admin-sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 768) {
+            closeAdminSidebar();
+          }
+        });
+      });
+    }
+    
+    function toggleAdminSidebar() {
+      const sidebar = document.querySelector('.admin-sidebar');
+      const overlay = document.getElementById('adminSidebarOverlay');
+      
+      if (sidebar) {
+        sidebar.classList.toggle('open');
+      }
+      
+      if (overlay) {
+        overlay.classList.toggle('active');
+      }
+      
+      document.body.style.overflow = sidebar?.classList.contains('open') ? 'hidden' : '';
+    }
+    
+    function closeAdminSidebar() {
+      const sidebar = document.querySelector('.admin-sidebar');
+      const overlay = document.getElementById('adminSidebarOverlay');
+      
+      if (sidebar) {
+        sidebar.classList.remove('open');
+      }
+      
+      if (overlay) {
+        overlay.classList.remove('active');
+      }
+      
+      document.body.style.overflow = '';
+    }
+
+    // Auth check - ONLY ADMIN USERS CAN ACCESS THIS PAGE
+    function checkAuth() {
+      const userData = localStorage.getItem('scamshield_user');
+      const accessTokenStored = localStorage.getItem('scamshield_access_token');
+      const userRole = localStorage.getItem('userRole');
+      
+      console.log('=== Admin Panel Auth Check ===');
+      console.log('Access token exists:', !!accessTokenStored);
+      console.log('User role from storage:', userRole);
+      
+      // If no user data or no token, redirect to login
+      if (!userData || !accessTokenStored) {
+        console.log('No authentication found, redirecting to login');
+        showAccessDenied('Please log in to access the admin panel');
+        setTimeout(() => { window.location.href = './login.html'; }, 2000);
+        return;
+      }
+
+      try {
+        currentUser = JSON.parse(userData);
+        console.log('Parsed user:', currentUser);
+        console.log('User role:', currentUser.role);
+        
+        // STRICT ADMIN CHECK - Only allow users with role === 'admin'
+        const isAdmin = currentUser.role === 'admin' || userRole === 'admin';
+        
+        if (!isAdmin) {
+          console.log('ACCESS DENIED: Non-admin user trying to access admin panel');
+          showAccessDenied('Access Denied: Admin privileges required');
+          setTimeout(() => { window.location.href = './dashboard.html'; }, 2000);
+          return;
+        }
+        
+        console.log('Admin access granted!');
+        
+        // For demo mode: detect if using demo token
+        const storedToken = accessToken || accessTokenStored;
+        if (!storedToken || storedToken.startsWith('demo_token_')) {
+          console.log('Running in demo mode - using demo token');
+          demoMode = true;
+        }
+
+        // Update UI with admin info
+        const displayName = currentUser.full_name || currentUser.name || currentUser.email?.split('@')[0] || 'Admin';
+        document.getElementById('admin-name').textContent = displayName;
+        document.getElementById('admin-avatar').textContent = displayName[0].toUpperCase();
+
+        // Load initial data
+        loadMetrics();
+        loadUsers();
+        loadSessions();
+        loadScammers();
+      } catch (e) {
+        console.error('Auth error:', e);
+        showAccessDenied('Authentication error. Please log in again.');
+        setTimeout(() => { window.location.href = './login.html'; }, 2000);
+        return;
+      }
+    }
+    
+    // Show access denied message
+    function showAccessDenied(message) {
+      document.body.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0a0a0a;color:#f5f2eb;font-family:system-ui,-apple-system,sans-serif;">
+          <div style="text-align:center;padding:2rem;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" style="margin-bottom:1rem;">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+            </svg>
+            <h1 style="font-size:1.5rem;margin-bottom:0.5rem;color:#dc2626;">Access Denied</h1>
+            <p style="color:#888;margin-bottom:1rem;">${message}</p>
+            <p style="color:#666;font-size:0.875rem;">Redirecting...</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Logout - clear all auth data and redirect to login
+    function logout() {
+      localStorage.removeItem('scamshield_access_token');
+      localStorage.removeItem('scamshield_refresh_token');
+      localStorage.removeItem('scamshield_user');
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      window.location.href = './login.html';
+    }
+
+    // View switching
+    function showView(viewName) {
+      // Hide all views
+      document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+      // Show selected view
+      document.getElementById(`view-${viewName}`).classList.add('active');
+      event.target.closest('.nav-link').classList.add('active');
+    }
+
+    // API helper
+    async function apiCall(endpoint, options = {}) {
+      // Get fresh token from localStorage
+      const currentToken = localStorage.getItem('scamshield_access_token');
+      
+      // Skip API calls in demo mode or with demo token
+      if (demoMode || !currentToken || currentToken.startsWith('demo_token_')) {
+        console.log('Demo mode: skipping API call to', endpoint);
+        return null;
+      }
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentToken}`
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+          ...options,
+          headers: { ...headers, ...options.headers }
+        });
+
+        if (response.status === 401) {
+          // Only logout if we have a real token that expired
+          // Demo tokens starting with 'demo_token_' should not trigger logout
+          const tokenNow = localStorage.getItem('scamshield_access_token');
+          if (tokenNow && !tokenNow.startsWith('demo_token_')) {
+            console.log('401 received with real token, logging out');
+            logout();
+          } else {
+            console.log('401 received but in demo mode, ignoring');
+          }
+          return null;
+        }
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error('API call failed:', error);
+        return null;
+      }
+    }
+
+    // Load Metrics
+    async function loadMetrics() {
+      let data = null;
+      
+      if (!demoMode) {
+        data = await apiCall('/admin/metrics');
+      }
+      
+      if (data) {
+        document.getElementById('stat-users').textContent = formatNumber(data.users?.total || 0);
+        document.getElementById('stat-users-change').textContent = `${data.users?.active || 0} active`;
+        document.getElementById('users-count').textContent = data.users?.total || 0;
+
+        document.getElementById('stat-api').textContent = formatNumber(data.scans?.today || 0);
+        document.getElementById('stat-api-change').textContent = `${formatNumber(data.scans?.this_week || 0)} this week`;
+
+        document.getElementById('stat-threats').textContent = formatNumber(data.threats?.total_blocked || 0);
+        
+        if (data.honeypot) {
+          document.getElementById('stat-sessions').textContent = data.honeypot.active_sessions || 0;
+        }
+
+        // Update threats view
+        const threatsTotal = document.getElementById('threats-total');
+        const threatsToday = document.getElementById('threats-today');
+        const threatsWeek = document.getElementById('threats-week');
+        if (threatsTotal) threatsTotal.textContent = formatNumber(data.threats?.total_blocked || 0);
+        if (threatsToday) threatsToday.textContent = formatNumber(data.scans?.today || 0);
+        if (threatsWeek) threatsWeek.textContent = formatNumber(data.scans?.this_week || 0);
+      } else {
+        // Demo data fallback
+        document.getElementById('stat-users').textContent = '2,147';
+        document.getElementById('stat-users-change').textContent = '↑ 127 this week';
+        document.getElementById('users-count').textContent = '2,147';
+        document.getElementById('stat-sessions').textContent = '384';
+        document.getElementById('stat-api').textContent = '48.2K';
+        document.getElementById('stat-api-change').textContent = '↑ 18% avg';
+        document.getElementById('stat-threats').textContent = '1,247';
+      }
+    }
+
+    function refreshMetrics() {
+      loadMetrics();
+    }
+
+    // Demo users data
+    const demoUsers = [
+      { id: '1', email: 'admin@scamshield.io', full_name: 'Admin User', role: 'admin', is_active: true, is_verified: true, created_at: '2024-01-15T10:00:00Z', last_login: '2024-02-01T15:30:00Z' },
+      { id: '2', email: 'john.doe@example.com', full_name: 'John Doe', role: 'user', is_active: true, is_verified: true, created_at: '2024-01-20T08:00:00Z', last_login: '2024-02-01T09:45:00Z' },
+      { id: '3', email: 'sarah.connor@future.io', full_name: 'Sarah Connor', role: 'user', is_active: true, is_verified: true, created_at: '2024-01-22T14:30:00Z', last_login: '2024-01-31T18:20:00Z' },
+      { id: '4', email: 'test.user@mail.com', full_name: 'Test User', role: 'user', is_active: false, is_verified: false, created_at: '2024-01-25T11:00:00Z', last_login: null },
+      { id: '5', email: 'developer@scamshield.io', full_name: 'Developer Account', role: 'admin', is_active: true, is_verified: true, created_at: '2024-01-10T09:00:00Z', last_login: '2024-02-01T14:00:00Z' },
+    ];
+
+    // Load Users
+    async function loadUsers() {
+      const search = document.getElementById('user-search')?.value || '';
+      let data = null;
+      
+      if (!demoMode) {
+        data = await apiCall(`/admin/users?page=${usersPage}&limit=${PAGE_SIZE}&search=${search}`);
+      }
+
+      const tbody = document.getElementById('users-table-body');
+      
+      // Use demo data if no API data
+      if (!data || !data.items) {
+        const filtered = search ? demoUsers.filter(u => 
+          u.email.toLowerCase().includes(search.toLowerCase()) || 
+          u.full_name?.toLowerCase().includes(search.toLowerCase())
+        ) : demoUsers;
+        data = { items: filtered, total: filtered.length, has_more: false };
+      }
+
+      if (data && data.items && data.items.length > 0) {
+        tbody.innerHTML = data.items.map(user => `
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar-sm" style="background:${user.role === 'admin' ? 'linear-gradient(135deg, var(--admin-accent), #8B0000)' : 'var(--admin-border)'};">
+                  ${(user.full_name || user.email)[0].toUpperCase()}
+                </div>
+                <div class="user-info-sm">
+                  <span class="name">${user.full_name || 'N/A'}</span>
+                  <span class="email">${user.email}</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge ${user.role === 'admin' ? 'badge-danger' : 'badge-info'}">${user.role}</span></td>
+            <td><span class="badge ${user.is_active ? 'badge-success' : 'badge-warning'}">${user.is_active ? 'Active' : 'Inactive'}</span></td>
+            <td>${user.is_verified ? '✓' : '—'}</td>
+            <td style="font-size:0.85rem;">${formatDate(user.created_at)}</td>
+            <td style="font-size:0.85rem;">${user.last_login ? formatDate(user.last_login) : 'Never'}</td>
+            <td>
+              <div style="display:flex;gap:0.25rem;">
+                <button class="btn btn-sm btn-outline btn-icon" onclick="viewUser('${user.id}')" title="View">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <button class="btn btn-sm btn-outline btn-icon" onclick="toggleBan('${user.id}', ${user.is_active})" title="${user.is_active ? 'Ban' : 'Unban'}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('users-pagination-info').textContent = 
+          `Showing ${(usersPage - 1) * PAGE_SIZE + 1}-${Math.min(usersPage * PAGE_SIZE, data.total)} of ${data.total} users`;
+        document.getElementById('users-prev').disabled = usersPage === 1;
+        document.getElementById('users-next').disabled = !data.has_more;
+      } else {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7">
+              <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                </svg>
+                <h3>No users found</h3>
+                <p>No users match your search criteria</p>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    function searchUsers() {
+      clearTimeout(window.searchTimeout);
+      window.searchTimeout = setTimeout(() => {
+        usersPage = 1;
+        loadUsers();
+      }, 300);
+    }
+
+    function filterUsers() {
+      usersPage = 1;
+      loadUsers();
+    }
+
+    function prevUsersPage() {
+      if (usersPage > 1) {
+        usersPage--;
+        loadUsers();
+      }
+    }
+
+    function nextUsersPage() {
+      usersPage++;
+      loadUsers();
+    }
+
+    async function viewUser(userId) {
+      // Try API first, fallback to demo data
+      let user = null;
+      if (!demoMode) {
+        user = await apiCall(`/admin/users/${userId}`);
+      }
+      
+      // Use demo data if no API response
+      if (!user) {
+        user = demoUsers.find(u => u.id === userId) || {
+          id: userId,
+          email: 'user@example.com',
+          full_name: 'Demo User',
+          phone: '+91-9876543210',
+          role: 'user',
+          is_active: true,
+          is_verified: true,
+          created_at: '2024-01-15T10:30:00Z'
+        };
+      }
+      
+      document.getElementById('user-modal-title').textContent = 'User Details';
+      document.getElementById('user-modal-body').innerHTML = `
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="text" class="form-control" value="${user.email}" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="edit-user-name" value="${user.full_name || 'N/A'}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="text" class="form-control" id="edit-user-phone" value="${user.phone || 'N/A'}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select class="form-control" id="edit-user-role">
+            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <span class="badge ${user.is_active ? 'badge-success' : 'badge-warning'}">${user.is_active ? 'Active' : 'Banned'}</span>
+            <button class="btn btn-sm ${user.is_active ? 'btn-warning' : 'btn-success'}" onclick="toggleBan('${userId}', ${user.is_active})">
+              ${user.is_active ? 'Ban User' : 'Unban User'}
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Created</label>
+          <input type="text" class="form-control" value="${formatDate(user.created_at)}" readonly>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--admin-border);">
+          <button class="btn btn-outline" onclick="resetUserPassword('${userId}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            Reset Password
+          </button>
+          <button class="btn btn-danger" onclick="deleteUser('${userId}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+            </svg>
+            Delete User
+          </button>
+        </div>
+      `;
+      document.getElementById('user-modal-action').textContent = 'Save Changes';
+      document.getElementById('user-modal-action').onclick = () => updateUserDetails(userId);
+      document.getElementById('user-modal').classList.add('active');
+    }
+    
+    async function updateUserDetails(userId) {
+      const name = document.getElementById('edit-user-name').value;
+      const phone = document.getElementById('edit-user-phone').value;
+      const role = document.getElementById('edit-user-role').value;
+      
+      // Update in demo data
+      const user = demoUsers.find(u => u.id === userId);
+      if (user) {
+        user.full_name = name;
+        user.phone = phone;
+        user.role = role;
+      }
+      
+      // Also try API
+      if (!demoMode) {
+        await apiCall(`/admin/users/${userId}/role?role=${role}`, { method: 'PUT' });
+      }
+      
+      closeUserModal();
+      loadUsers();
+      showToast('User updated successfully', 'success');
+    }
+
+    async function updateUserRole(userId) {
+      const newRole = document.getElementById('edit-user-role').value;
+      const result = await apiCall(`/admin/users/${userId}/role?role=${newRole}`, { method: 'PUT' });
+      if (result) {
+        closeUserModal();
+        loadUsers();
+      }
+    }
+
+    async function toggleBan(userId, isCurrentlyActive) {
+      const action = isCurrentlyActive ? 'ban' : 'unban';
+      showConfirm(`${action.charAt(0).toUpperCase() + action.slice(1)} User`, `Are you sure you want to ${action} this user?`, async () => {
+        // Update in demo data
+        const user = demoUsers.find(u => u.id === userId);
+        if (user) {
+          user.is_active = !isCurrentlyActive;
+        }
+        
+        // Also try API
+        if (!demoMode) {
+          await apiCall(`/admin/users/${userId}/ban?ban=${isCurrentlyActive}`, { method: 'PUT' });
+        }
+        
+        closeUserModal();
+        loadUsers();
+        showToast(`User ${action}ned successfully`, 'success');
+      });
+    }
+
+    function closeUserModal() {
+      document.getElementById('user-modal').classList.remove('active');
+    }
+
+    function showAddUserModal() {
+      document.getElementById('user-modal-title').textContent = 'Add New User';
+      document.getElementById('user-modal-body').innerHTML = `
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="new-user-email" placeholder="user@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="new-user-name" placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="new-user-password" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select class="form-control" id="new-user-role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      `;
+      document.getElementById('user-modal-action').textContent = 'Create User';
+      document.getElementById('user-modal-action').onclick = createUser;
+      document.getElementById('user-modal').classList.add('active');
+    }
+
+    async function createUser() {
+      const email = document.getElementById('new-user-email').value;
+      const name = document.getElementById('new-user-name').value;
+      const password = document.getElementById('new-user-password').value;
+
+      if (!email || !password) {
+        alert('Email and password are required');
+        return;
+      }
+
+      const result = await apiCall('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          full_name: name
+        })
+      });
+
+      if (result) {
+        closeUserModal();
+        loadUsers();
+        alert('User created successfully!');
+      }
+    }
+
+    // Demo sessions data
+    const demoSessions = [
+      { session_id: 'sess_abc123def456', scam_type: 'Phishing', confidence: 0.92, message_count: 15, has_intel: true, status: 'active', created_at: '2024-02-01T10:30:00Z' },
+      { session_id: 'sess_xyz789ghi012', scam_type: 'Romance Scam', confidence: 0.85, message_count: 42, has_intel: true, status: 'escalated', created_at: '2024-01-31T14:00:00Z' },
+      { session_id: 'sess_mno345pqr678', scam_type: 'Tech Support', confidence: 0.78, message_count: 8, has_intel: false, status: 'completed', created_at: '2024-01-30T09:15:00Z' },
+      { session_id: 'sess_stu901vwx234', scam_type: 'Lottery', confidence: 0.95, message_count: 23, has_intel: true, status: 'active', created_at: '2024-01-29T16:45:00Z' },
+    ];
+
+    // Load Sessions
+    async function loadSessions() {
+      const statusFilter = document.getElementById('session-status-filter')?.value || '';
+      let data = null;
+      
+      if (!demoMode) {
+        data = await apiCall(`/admin/sessions?page=${sessionsPage}&limit=${PAGE_SIZE}${statusFilter ? `&status=${statusFilter}` : ''}`);
+      }
+
+      const tbody = document.getElementById('sessions-table-body');
+      
+      // Use demo data if no API data
+      if (!data || !data.items) {
+        const filtered = statusFilter ? demoSessions.filter(s => s.status === statusFilter) : demoSessions;
+        data = { items: filtered, total: filtered.length };
+      }
+
+      if (data && data.items && data.items.length > 0) {
+        tbody.innerHTML = data.items.map(session => `
+          <tr>
+            <td style="font-family:var(--font-mono);font-size:0.8rem;">${session.session_id.substring(0, 12)}...</td>
+            <td>${session.scam_type || 'Unknown'}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="risk-bar">
+                  <div class="risk-fill ${session.confidence > 0.7 ? 'high' : session.confidence > 0.4 ? 'medium' : 'low'}" 
+                       style="width:${(session.confidence * 100)}%"></div>
+                </div>
+                <span style="font-size:0.8rem;">${(session.confidence * 100).toFixed(0)}%</span>
+              </div>
+            </td>
+            <td>${session.message_count}</td>
+            <td>${session.has_intel ? '<span class="badge badge-success">Yes</span>' : '—'}</td>
+            <td><span class="badge ${session.status === 'active' ? 'badge-success' : session.status === 'escalated' ? 'badge-danger' : 'badge-info'}">${session.status}</span></td>
+            <td style="font-size:0.85rem;">${formatDate(session.created_at)}</td>
+            <td>
+              <button class="btn btn-sm btn-outline" onclick="viewSession('${session.session_id}')">View</button>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('sessions-pagination-info').textContent = 
+          `Showing ${(sessionsPage - 1) * PAGE_SIZE + 1}-${Math.min(sessionsPage * PAGE_SIZE, data.total)} of ${data.total} sessions`;
+        document.getElementById('sessions-prev').disabled = sessionsPage === 1;
+        document.getElementById('sessions-next').disabled = (sessionsPage * PAGE_SIZE) >= data.total;
+      } else {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                </svg>
+                <h3>No sessions found</h3>
+                <p>No honeypot sessions match your criteria</p>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    function filterSessions() {
+      sessionsPage = 1;
+      loadSessions();
+    }
+
+    function prevSessionsPage() {
+      if (sessionsPage > 1) {
+        sessionsPage--;
+        loadSessions();
+      }
+    }
+
+    function nextSessionsPage() {
+      sessionsPage++;
+      loadSessions();
+    }
+
+    async function viewSession(sessionId) {
+      currentSessionId = sessionId;
+      
+      // Try API first, fallback to demo data
+      let session = null;
+      if (!demoMode) {
+        session = await apiCall(`/admin/sessions/${sessionId}`);
+      }
+      
+      // Use demo data if no API response
+      if (!session) {
+        session = demoSessions.find(s => s.session_id === sessionId) || {
+          session_id: sessionId,
+          status: 'active',
+          scam_type: 'phishing',
+          confidence: 0.89,
+          total_messages: 12,
+          engagement_duration: 485,
+          intel: { phones: ['+91-9876543210'], emails: ['scammer@fake.com'] },
+          messages: [
+            { sender: 'scammer', text: 'Hello, this is Microsoft Support. Your computer has a virus.' },
+            { sender: 'agent', text: 'Oh no! What should I do?' },
+            { sender: 'scammer', text: 'Please download this remote access tool so we can fix it.' },
+            { sender: 'agent', text: 'Okay, what is the website?' }
+          ]
+        };
+      }
+      
+      // Show/hide terminate button based on status
+      const terminateBtn = document.getElementById('terminate-session-btn');
+      if (terminateBtn) {
+        terminateBtn.style.display = session.status === 'active' ? 'inline-flex' : 'none';
+      }
+      
+      document.getElementById('session-modal-body').innerHTML = `
+        <div style="margin-bottom:1.5rem;">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1rem;">
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Session ID</div>
+              <div style="font-family:var(--font-mono);font-size:0.85rem;">${session.session_id}</div>
+            </div>
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Status</div>
+              <span class="badge ${session.status === 'active' ? 'badge-success' : 'badge-info'}">${session.status}</span>
+            </div>
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Scam Type</div>
+              <div>${session.scam_type || 'Unknown'}</div>
+            </div>
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Confidence</div>
+              <div>${((session.confidence || 0) * 100).toFixed(1)}%</div>
+            </div>
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Messages</div>
+              <div>${session.total_messages || 0}</div>
+            </div>
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Duration</div>
+              <div>${formatDuration(session.engagement_duration)}</div>
+            </div>
+          </div>
+        </div>
+
+        ${session.intel && (session.intel.phones?.length || session.intel.emails?.length) ? `
+          <div style="margin-bottom:1.5rem;">
+            <h4 style="font-size:0.9rem;margin-bottom:0.75rem;">Extracted Intel</h4>
+            <div style="background:rgba(0,0,0,0.3);padding:1rem;border-radius:6px;">
+              ${session.intel.phones?.length ? `<div style="margin-bottom:0.5rem;"><strong>Phones:</strong> ${session.intel.phones.join(', ')}</div>` : ''}
+              ${session.intel.emails?.length ? `<div><strong>Emails:</strong> ${session.intel.emails.join(', ')}</div>` : ''}
+            </div>
+          </div>
+        ` : ''}
+
+        <div>
+          <h4 style="font-size:0.9rem;margin-bottom:0.75rem;">Conversation</h4>
+          <div style="background:rgba(0,0,0,0.3);padding:1rem;border-radius:6px;max-height:300px;overflow-y:auto;">
+            ${(session.messages || []).map(msg => `
+              <div style="margin-bottom:0.75rem;padding:0.5rem;background:${msg.sender === 'scammer' ? 'rgba(196,30,58,0.1)' : 'rgba(76,175,80,0.1)'};border-radius:4px;">
+                <div style="font-size:0.75rem;color:rgba(245,242,235,0.5);margin-bottom:0.25rem;">${msg.sender === 'scammer' ? 'Scammer' : 'Agent'}</div>
+                <div style="font-size:0.85rem;">${msg.text}</div>
+              </div>
+            `).join('') || '<p style="color:rgba(245,242,235,0.5);">No messages</p>'}
+          </div>
+        </div>
+      `;
+      document.getElementById('session-modal').classList.add('active');
+    }
+
+    function closeSessionModal() {
+      document.getElementById('session-modal').classList.remove('active');
+      currentSessionId = null;
+    }
+
+    // Demo scammers data
+    const demoScammers = [
+      { id: '1', fingerprint_hash: 'fp_8a3bc9d2e1f4', phone_count: 3, email_count: 5, total_sessions: 12, risk_score: 0.95, threat_level: 'high', first_seen: '2024-01-10T08:00:00Z' },
+      { id: '2', fingerprint_hash: 'fp_2x9yz7w5v3u1', phone_count: 1, email_count: 2, total_sessions: 4, risk_score: 0.72, threat_level: 'medium', first_seen: '2024-01-18T12:30:00Z' },
+      { id: '3', fingerprint_hash: 'fp_n4m6k8j2h1g9', phone_count: 5, email_count: 8, total_sessions: 28, risk_score: 0.98, threat_level: 'high', first_seen: '2024-01-05T06:15:00Z' },
+      { id: '4', fingerprint_hash: 'fp_q1w2e3r4t5y6', phone_count: 2, email_count: 1, total_sessions: 2, risk_score: 0.45, threat_level: 'low', first_seen: '2024-01-28T19:00:00Z' },
+    ];
+
+    // Load Scammers
+    async function loadScammers() {
+      const minRisk = (document.getElementById('risk-filter')?.value || 0) / 100;
+      let data = null;
+      
+      if (!demoMode) {
+        data = await apiCall(`/admin/scammers?page=${scammersPage}&limit=${PAGE_SIZE}&min_risk=${minRisk}`);
+      }
+
+      const tbody = document.getElementById('scammers-table-body');
+      
+      // Use demo data if no API data
+      if (!data || !data.items) {
+        const filtered = demoScammers.filter(s => s.risk_score >= minRisk);
+        data = { items: filtered, total: filtered.length };
+      }
+
+      if (data && data.items && data.items.length > 0) {
+        tbody.innerHTML = data.items.map(scammer => `
+          <tr>
+            <td style="font-family:var(--font-mono);font-size:0.8rem;">${scammer.fingerprint_hash}</td>
+            <td>${scammer.phone_count}</td>
+            <td>${scammer.email_count}</td>
+            <td>${scammer.total_sessions}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="risk-bar">
+                  <div class="risk-fill ${scammer.risk_score > 0.7 ? 'high' : scammer.risk_score > 0.4 ? 'medium' : 'low'}" 
+                       style="width:${(scammer.risk_score * 100)}%"></div>
+                </div>
+                <span style="font-size:0.8rem;">${(scammer.risk_score * 100).toFixed(0)}%</span>
+              </div>
+            </td>
+            <td><span class="badge ${scammer.threat_level === 'high' ? 'badge-danger' : scammer.threat_level === 'medium' ? 'badge-warning' : 'badge-info'}">${scammer.threat_level}</span></td>
+            <td style="font-size:0.85rem;">${formatDate(scammer.first_seen)}</td>
+            <td>
+              <button class="btn btn-sm btn-outline" onclick="viewScammer('${scammer.id}')">View</button>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('scammers-pagination-info').textContent = 
+          `Showing ${(scammersPage - 1) * PAGE_SIZE + 1}-${Math.min(scammersPage * PAGE_SIZE, data.total)} of ${data.total} scammers`;
+        document.getElementById('scammers-prev').disabled = scammersPage === 1;
+        document.getElementById('scammers-next').disabled = (scammersPage * PAGE_SIZE) >= data.total;
+      } else {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                </svg>
+                <h3>No scammers found</h3>
+                <p>No scammer fingerprints match your criteria</p>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    function updateRiskLabel(value) {
+      document.getElementById('risk-label').textContent = `Min Risk: ${value}%`;
+    }
+
+    function filterScammers() {
+      scammersPage = 1;
+      loadScammers();
+    }
+
+    function prevScammersPage() {
+      if (scammersPage > 1) {
+        scammersPage--;
+        loadScammers();
+      }
+    }
+
+    function nextScammersPage() {
+      scammersPage++;
+      loadScammers();
+    }
+
+    async function viewScammer(scammerId) {
+      // Find scammer from demo data or API
+      let scammer = demoScammers.find(s => s.id === scammerId);
+      
+      if (!demoMode) {
+        const apiScammer = await apiCall(`/admin/scammers/${scammerId}`);
+        if (apiScammer) scammer = apiScammer;
+      }
+      
+      // Use demo data for display
+      if (!scammer) {
+        scammer = {
+          id: scammerId,
+          fingerprint_hash: 'fp_' + scammerId,
+          phone_numbers: ['+91-9876543210', '+1-555-123-4567'],
+          email_addresses: ['scammer@fake.com', 'phishing@evil.net'],
+          upi_ids: ['scammer@upi'],
+          scam_types: ['phishing', 'tech_support'],
+          total_sessions: 12,
+          risk_score: 0.92,
+          threat_level: 'high',
+          first_seen: '2024-01-10T08:00:00Z',
+          last_seen: '2026-02-01T10:30:00Z'
+        };
+      }
+      
+      currentScammerId = scammerId;
+      
+      document.getElementById('scammer-modal-body').innerHTML = `
+        <div style="margin-bottom:1.5rem;">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;">
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Fingerprint</div>
+              <div style="font-family:var(--font-mono);font-size:0.85rem;">${scammer.fingerprint_hash}</div>
+            </div>
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Threat Level</div>
+              <span class="badge ${scammer.threat_level === 'high' ? 'badge-danger' : scammer.threat_level === 'medium' ? 'badge-warning' : 'badge-info'}">${scammer.threat_level}</span>
+            </div>
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Risk Score</div>
+              <div style="font-size:1.25rem;font-weight:600;color:var(--admin-accent);">${((scammer.risk_score || 0.92) * 100).toFixed(0)}%</div>
+            </div>
+            <div>
+              <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Total Sessions</div>
+              <div style="font-size:1.25rem;font-weight:600;">${scammer.total_sessions}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom:1.5rem;">
+          <h4 style="font-size:0.9rem;margin-bottom:0.75rem;">Phone Numbers</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            ${(scammer.phone_numbers || ['+91-9876543210']).map(p => `<span class="badge badge-outline" style="font-family:var(--font-mono);">${p}</span>`).join('')}
+          </div>
+        </div>
+        
+        <div style="margin-bottom:1.5rem;">
+          <h4 style="font-size:0.9rem;margin-bottom:0.75rem;">Email Addresses</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            ${(scammer.email_addresses || ['scammer@fake.com']).map(e => `<span class="badge badge-outline">${e}</span>`).join('')}
+          </div>
+        </div>
+        
+        ${(scammer.upi_ids && scammer.upi_ids.length) ? `
+        <div style="margin-bottom:1.5rem;">
+          <h4 style="font-size:0.9rem;margin-bottom:0.75rem;">UPI IDs</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            ${scammer.upi_ids.map(u => `<span class="badge badge-outline" style="font-family:var(--font-mono);">${u}</span>`).join('')}
+          </div>
+        </div>
+        ` : ''}
+        
+        <div style="margin-bottom:1.5rem;">
+          <h4 style="font-size:0.9rem;margin-bottom:0.75rem;">Scam Types</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+            ${(scammer.scam_types || ['phishing']).map(t => `<span class="badge badge-warning">${t}</span>`).join('')}
+          </div>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;padding-top:1rem;border-top:1px solid var(--admin-border);">
+          <div>
+            <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">First Seen</div>
+            <div style="font-size:0.85rem;">${formatDate(scammer.first_seen)}</div>
+          </div>
+          <div>
+            <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Last Active</div>
+            <div style="font-size:0.85rem;">${formatDate(scammer.last_seen || new Date().toISOString())}</div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('scammer-modal').classList.add('active');
+    }
+    
+    function closeScammerModal() {
+      document.getElementById('scammer-modal').classList.remove('active');
+      currentScammerId = null;
+    }
+    
+    function blockScammer() {
+      showToast('Scammer blocked and added to global blocklist', 'success');
+      closeScammerModal();
+      loadScammers();
+    }
+    
+    function exportScammerData() {
+      const data = {
+        fingerprint: currentScammerId,
+        exported_at: new Date().toISOString(),
+        phone_numbers: ['+91-9876543210'],
+        email_addresses: ['scammer@fake.com'],
+        threat_level: 'high'
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `scammer-intel-${currentScammerId}.json`;
+      a.click();
+      showToast('Scammer intel exported', 'success');
+    }
+
+    // Utility functions
+    function formatNumber(num) {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toString();
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return 'N/A';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatDuration(seconds) {
+      if (!seconds) return '—';
+      if (seconds < 60) return `${seconds}s`;
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+      return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+    }
+
+    // Provider refresh
+    function refreshProviders() {
+      alert('Provider status refreshed');
+    }
+
+    // Export functions
+    function exportThreats() {
+      alert('Exporting threats data...');
+    }
+
+    function exportLogs() {
+      const logs = document.getElementById('logs-content')?.textContent || '';
+      const blob = new Blob([logs], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `scamshield-logs-${new Date().toISOString().split('T')[0]}.txt`;
+      a.click();
+      showToast('Logs exported successfully', 'success');
+    }
+
+    function clearLogs() {
+      if (confirm('Are you sure you want to clear all logs?')) {
+        const logsContent = document.getElementById('logs-content');
+        if (logsContent) {
+          logsContent.textContent = '[' + new Date().toISOString().replace('T', ' ').split('.')[0] + '] INFO  - Logs cleared by admin\n';
+        }
+        showToast('Logs cleared', 'info');
+      }
+    }
+
+    // Toast notification system
+    function showToast(message, type = 'info') {
+      // Create toast container if not exists
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;';
+        document.body.appendChild(container);
+      }
+      
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'rgba(76,175,80,0.95)' : type === 'error' ? 'rgba(196,30,58,0.95)' : 'rgba(33,33,33,0.95)';
+      toast.style.cssText = `
+        background:${bgColor};
+        color:#fff;
+        padding:0.75rem 1.25rem;
+        border-radius:8px;
+        font-size:0.9rem;
+        box-shadow:0 4px 12px rgba(0,0,0,0.3);
+        animation:slideIn 0.3s ease;
+      `;
+      toast.textContent = message;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+    
+    // ===============================
+    // SETTINGS FUNCTIONS
+    // ===============================
+    
+    function updateConfidenceLabel(value) {
+      document.getElementById('confidence-label').textContent = value + '%';
+    }
+    
+    function saveSettings(section) {
+      switch(section) {
+        case 'general':
+          systemSettings.general = {
+            siteName: document.getElementById('setting-site-name').value,
+            supportEmail: document.getElementById('setting-support-email').value,
+            timezone: document.getElementById('setting-timezone').value
+          };
+          break;
+        case 'security':
+          systemSettings.security = {
+            sessionTimeout: parseInt(document.getElementById('setting-session-timeout').value),
+            maxAttempts: parseInt(document.getElementById('setting-max-attempts').value),
+            twoFactor: document.getElementById('setting-2fa').value
+          };
+          break;
+        case 'api':
+          systemSettings.api = {
+            rateLimit: parseInt(document.getElementById('setting-rate-limit').value),
+            quota: parseInt(document.getElementById('setting-quota').value),
+            webhookTimeout: parseInt(document.getElementById('setting-webhook-timeout').value)
+          };
+          break;
+        case 'notifications':
+          systemSettings.notifications = {
+            email: document.getElementById('setting-email-notif').checked,
+            threats: document.getElementById('setting-threat-alerts').checked,
+            weekly: document.getElementById('setting-weekly-reports').checked,
+            system: document.getElementById('setting-system-alerts').checked
+          };
+          break;
+        case 'detection':
+          systemSettings.detection = {
+            confidence: parseInt(document.getElementById('setting-confidence').value),
+            autoblock: document.getElementById('setting-autoblock').value,
+            engagementLimit: parseInt(document.getElementById('setting-engagement-limit').value)
+          };
+          break;
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('scamshield_settings', JSON.stringify(systemSettings));
+      showToast(`${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully`, 'success');
+    }
+    
+    function saveAllSettings() {
+      saveSettings('general');
+      saveSettings('security');
+      saveSettings('api');
+      saveSettings('notifications');
+      saveSettings('detection');
+      showToast('All settings saved successfully', 'success');
+    }
+    
+    function resetAllSettings() {
+      showConfirm('Reset All Settings', 'Are you sure you want to reset all settings to defaults?', () => {
+        localStorage.removeItem('scamshield_settings');
+        location.reload();
+      });
+    }
+    
+    function loadSettings() {
+      const saved = localStorage.getItem('scamshield_settings');
+      if (saved) {
+        systemSettings = JSON.parse(saved);
+        // Apply to form fields
+        if (document.getElementById('setting-site-name')) {
+          document.getElementById('setting-site-name').value = systemSettings.general?.siteName || 'ScamShield Pro';
+          document.getElementById('setting-support-email').value = systemSettings.general?.supportEmail || 'support@scamshield.pro';
+          document.getElementById('setting-timezone').value = systemSettings.general?.timezone || 'Asia/Kolkata';
+        }
+      }
+    }
+    
+    function createBackup() {
+      const backupData = {
+        settings: systemSettings,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+      };
+      
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `scamshield-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      
+      document.getElementById('last-backup-time').textContent = new Date().toLocaleString();
+      showToast('Backup created successfully', 'success');
+    }
+    
+    function restoreBackup() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            if (data.settings) {
+              systemSettings = data.settings;
+              localStorage.setItem('scamshield_settings', JSON.stringify(systemSettings));
+              showToast('Backup restored successfully', 'success');
+              setTimeout(() => location.reload(), 1000);
+            }
+          } catch (err) {
+            showToast('Invalid backup file', 'error');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+    
+    // ===============================
+    // LOGS FUNCTIONS
+    // ===============================
+    
+    function loadLogs() {
+      const filter = document.getElementById('log-level-filter')?.value || '';
+      const filtered = filter ? demoLogs.filter(l => l.level === filter) : demoLogs;
+      
+      const logsContent = document.getElementById('logs-content');
+      logsContent.innerHTML = filtered.map(log => {
+        const color = log.level === 'ERROR' ? '#FF5252' : 
+                      log.level === 'WARN' ? '#FFB74D' : 
+                      log.level === 'DEBUG' ? '#64B5F6' : '#4CAF50';
+        return `<span style="color:${color}">[${log.time}] ${log.level.padEnd(5)} - ${log.message}</span>`;
+      }).join('\n');
+      
+      document.getElementById('logs-count').textContent = `${filtered.length} entries`;
+      document.getElementById('logs-last-updated').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+    }
+    
+    function filterLogs() {
+      loadLogs();
+    }
+    
+    function refreshLogs() {
+      // Add a new log entry
+      const newLog = {
+        time: new Date().toISOString().replace('T', ' ').split('.')[0],
+        level: 'INFO',
+        message: 'Manual log refresh triggered by admin'
+      };
+      demoLogs.unshift(newLog);
+      loadLogs();
+      showToast('Logs refreshed', 'info');
+    }
+    
+    function toggleAutoRefresh() {
+      const enabled = document.getElementById('auto-refresh-logs').checked;
+      if (enabled) {
+        logsRefreshInterval = setInterval(() => {
+          const newLog = {
+            time: new Date().toISOString().replace('T', ' ').split('.')[0],
+            level: ['INFO', 'INFO', 'INFO', 'WARN', 'DEBUG'][Math.floor(Math.random() * 5)],
+            message: ['Health check passed', 'Session created', 'API request processed', 'Cache updated', 'Metrics collected'][Math.floor(Math.random() * 5)]
+          };
+          demoLogs.unshift(newLog);
+          if (demoLogs.length > 100) demoLogs.pop();
+          loadLogs();
+        }, 5000);
+        showToast('Auto-refresh enabled (5s interval)', 'info');
+      } else {
+        clearInterval(logsRefreshInterval);
+        showToast('Auto-refresh disabled', 'info');
+      }
+    }
+    
+    function clearLogs() {
+      showConfirm('Clear Logs', 'Are you sure you want to clear all logs?', () => {
+        demoLogs.length = 0;
+        demoLogs.push({
+          time: new Date().toISOString().replace('T', ' ').split('.')[0],
+          level: 'INFO',
+          message: 'Logs cleared by admin'
+        });
+        loadLogs();
+        showToast('Logs cleared', 'info');
+      });
+    }
+    
+    function exportLogs() {
+      const logs = document.getElementById('logs-content')?.textContent || '';
+      const blob = new Blob([logs], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `scamshield-logs-${new Date().toISOString().split('T')[0]}.txt`;
+      a.click();
+      showToast('Logs exported successfully', 'success');
+    }
+    
+    // ===============================
+    // THREATS FUNCTIONS
+    // ===============================
+    
+    function loadThreats() {
+      const typeFilter = document.getElementById('threat-type-filter')?.value || '';
+      const severityFilter = document.getElementById('threat-severity-filter')?.value || '';
+      const statusFilter = document.getElementById('threat-status-filter')?.value || '';
+      
+      let filtered = [...demoThreats];
+      if (typeFilter) filtered = filtered.filter(t => t.type === typeFilter);
+      if (severityFilter) filtered = filtered.filter(t => t.severity === severityFilter);
+      if (statusFilter) filtered = filtered.filter(t => t.status === statusFilter);
+      
+      const tbody = document.getElementById('threats-table-body');
+      tbody.innerHTML = filtered.map(threat => `
+        <tr>
+          <td><input type="checkbox" class="threat-checkbox" data-id="${threat.id}" style="width:16px;height:16px;"></td>
+          <td style="font-size:0.85rem;">${threat.time}</td>
+          <td><span class="badge badge-warning">${threat.type}</span></td>
+          <td style="font-family:var(--font-mono);font-size:0.8rem;">${threat.source}</td>
+          <td>${(threat.confidence * 100).toFixed(0)}%</td>
+          <td><span class="badge ${threat.severity === 'critical' ? 'badge-danger' : threat.severity === 'high' ? 'badge-warning' : 'badge-info'}">${threat.severity}</span></td>
+          <td><span class="badge ${threat.status === 'blocked' ? 'badge-danger' : threat.status === 'allowed' ? 'badge-success' : 'badge-info'}">${threat.status}</span></td>
+          <td>
+            <div style="display:flex;gap:0.25rem;">
+              <button class="btn btn-sm btn-outline" onclick="viewThreat('${threat.id}')">View</button>
+              ${threat.status === 'pending' ? `
+                <button class="btn btn-sm btn-success" onclick="allowSingleThreat('${threat.id}')">Allow</button>
+                <button class="btn btn-sm btn-danger" onclick="blockSingleThreat('${threat.id}')">Block</button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('threats-pagination-info').textContent = `Showing 1-${filtered.length} of ${filtered.length} threats`;
+    }
+    
+    function refreshThreats() {
+      loadThreats();
+      showToast('Threats refreshed', 'info');
+    }
+    
+    function filterThreats() {
+      loadThreats();
+    }
+    
+    function prevThreatsPage() {
+      if (threatsPage > 1) {
+        threatsPage--;
+        loadThreats();
+      }
+    }
+    
+    function nextThreatsPage() {
+      threatsPage++;
+      loadThreats();
+    }
+    
+    function toggleAllThreats(checkbox) {
+      document.querySelectorAll('.threat-checkbox').forEach(cb => cb.checked = checkbox.checked);
+    }
+    
+    function getSelectedThreats() {
+      return Array.from(document.querySelectorAll('.threat-checkbox:checked')).map(cb => cb.dataset.id);
+    }
+    
+    function bulkBlockThreats() {
+      const selected = getSelectedThreats();
+      if (selected.length === 0) {
+        showToast('No threats selected', 'error');
+        return;
+      }
+      showConfirm('Block Threats', `Block ${selected.length} selected threat(s)?`, () => {
+        selected.forEach(id => {
+          const threat = demoThreats.find(t => t.id === id);
+          if (threat) threat.status = 'blocked';
+        });
+        loadThreats();
+        showToast(`${selected.length} threat(s) blocked`, 'success');
+      });
+    }
+    
+    function bulkAllowThreats() {
+      const selected = getSelectedThreats();
+      if (selected.length === 0) {
+        showToast('No threats selected', 'error');
+        return;
+      }
+      showConfirm('Allow Threats', `Allow ${selected.length} selected threat(s)?`, () => {
+        selected.forEach(id => {
+          const threat = demoThreats.find(t => t.id === id);
+          if (threat) threat.status = 'allowed';
+        });
+        loadThreats();
+        showToast(`${selected.length} threat(s) allowed`, 'success');
+      });
+    }
+    
+    function viewThreat(threatId) {
+      const threat = demoThreats.find(t => t.id === threatId);
+      if (!threat) return;
+      
+      currentThreatId = threatId;
+      
+      document.getElementById('threat-modal-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem;">
+          <div>
+            <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Type</div>
+            <span class="badge badge-warning">${threat.type}</span>
+          </div>
+          <div>
+            <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Severity</div>
+            <span class="badge ${threat.severity === 'critical' ? 'badge-danger' : threat.severity === 'high' ? 'badge-warning' : 'badge-info'}">${threat.severity}</span>
+          </div>
+          <div>
+            <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Confidence</div>
+            <div style="font-size:1.25rem;font-weight:600;">${(threat.confidence * 100).toFixed(0)}%</div>
+          </div>
+          <div>
+            <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Status</div>
+            <span class="badge ${threat.status === 'blocked' ? 'badge-danger' : threat.status === 'allowed' ? 'badge-success' : 'badge-info'}">${threat.status}</span>
+          </div>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Source</div>
+          <div style="font-family:var(--font-mono);font-size:0.9rem;padding:0.5rem;background:rgba(0,0,0,0.3);border-radius:4px;margin-top:0.25rem;">${threat.source}</div>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Detected At</div>
+          <div style="font-size:0.9rem;">${threat.time}</div>
+        </div>
+        <div>
+          <div style="color:rgba(245,242,235,0.5);font-size:0.8rem;">Detection Reason</div>
+          <div style="font-size:0.85rem;padding:0.75rem;background:rgba(0,0,0,0.3);border-radius:4px;margin-top:0.25rem;">
+            Pattern matched: ${threat.type} signature detected with ${(threat.confidence * 100).toFixed(0)}% confidence. 
+            Source flagged in threat intelligence database.
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('threat-modal').classList.add('active');
+    }
+    
+    function closeThreatModal() {
+      document.getElementById('threat-modal').classList.remove('active');
+      currentThreatId = null;
+    }
+    
+    function allowThreat() {
+      if (currentThreatId) {
+        const threat = demoThreats.find(t => t.id === currentThreatId);
+        if (threat) threat.status = 'allowed';
+        loadThreats();
+        showToast('Threat allowed', 'success');
+      }
+      closeThreatModal();
+    }
+    
+    function blockThreat() {
+      if (currentThreatId) {
+        const threat = demoThreats.find(t => t.id === currentThreatId);
+        if (threat) threat.status = 'blocked';
+        loadThreats();
+        showToast('Threat blocked', 'success');
+      }
+      closeThreatModal();
+    }
+    
+    function allowSingleThreat(threatId) {
+      const threat = demoThreats.find(t => t.id === threatId);
+      if (threat) {
+        threat.status = 'allowed';
+        loadThreats();
+        showToast('Threat allowed', 'success');
+      }
+    }
+    
+    function blockSingleThreat(threatId) {
+      const threat = demoThreats.find(t => t.id === threatId);
+      if (threat) {
+        threat.status = 'blocked';
+        loadThreats();
+        showToast('Threat blocked', 'success');
+      }
+    }
+    
+    function exportThreats() {
+      const data = demoThreats.map(t => ({
+        id: t.id,
+        time: t.time,
+        type: t.type,
+        source: t.source,
+        confidence: t.confidence,
+        severity: t.severity,
+        status: t.status
+      }));
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `threats-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      showToast('Threats exported successfully', 'success');
+    }
+    
+    // ===============================
+    // PROVIDER FUNCTIONS
+    // ===============================
+    
+    function testProvider(providerId) {
+      showToast(`Testing ${providerId} connection...`, 'info');
+      setTimeout(() => {
+        showToast(`${providerId} connection successful (${Math.floor(Math.random() * 100 + 100)}ms)`, 'success');
+      }, 1500);
+    }
+    
+    function testAllProviders() {
+      showToast('Testing all provider connections...', 'info');
+      setTimeout(() => {
+        showToast('All providers operational', 'success');
+      }, 2000);
+    }
+    
+    function configureProvider(providerId) {
+      currentProviderId = providerId;
+      document.getElementById('provider-modal-title').textContent = `Configure ${providerId.charAt(0).toUpperCase() + providerId.slice(1)}`;
+      
+      const models = {
+        groq: ['llama-3.3-70b', 'llama-3.1-8b', 'mixtral-8x7b', 'gemma-7b'],
+        deepseek: ['deepseek-chat', 'deepseek-coder'],
+        ollama: ['llama2', 'mistral', 'codellama', 'vicuna']
+      };
+      
+      const modelSelect = document.getElementById('provider-model');
+      modelSelect.innerHTML = (models[providerId] || ['default']).map(m => `<option>${m}</option>`).join('');
+      
+      document.getElementById('provider-modal').classList.add('active');
+    }
+    
+    function closeProviderModal() {
+      document.getElementById('provider-modal').classList.remove('active');
+      currentProviderId = null;
+    }
+    
+    function testProviderConnection() {
+      showToast('Testing connection...', 'info');
+      setTimeout(() => {
+        showToast('Connection successful!', 'success');
+      }, 1500);
+    }
+    
+    function saveProviderConfig() {
+      showToast(`${currentProviderId} configuration saved`, 'success');
+      closeProviderModal();
+    }
+    
+    function showAddProviderModal() {
+      document.getElementById('add-provider-modal').classList.add('active');
+    }
+    
+    function closeAddProviderModal() {
+      document.getElementById('add-provider-modal').classList.remove('active');
+    }
+    
+    function updateNewProviderForm() {
+      const type = document.getElementById('new-provider-type').value;
+      document.getElementById('custom-endpoint-group').style.display = type === 'custom' ? 'block' : 'none';
+    }
+    
+    function addNewProvider() {
+      const type = document.getElementById('new-provider-type').value;
+      const name = document.getElementById('new-provider-name').value;
+      const key = document.getElementById('new-provider-key').value;
+      
+      if (!type || !name || !key) {
+        showToast('Please fill all required fields', 'error');
+        return;
+      }
+      
+      showToast(`Provider "${name}" added successfully`, 'success');
+      closeAddProviderModal();
+    }
+    
+    function toggleOllama() {
+      const btn = document.getElementById('ollama-toggle-btn');
+      const statusBadge = document.getElementById('ollama-status');
+      
+      if (btn.textContent === 'Start') {
+        btn.textContent = 'Starting...';
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.textContent = 'Stop';
+          btn.disabled = false;
+          btn.classList.remove('btn-primary');
+          btn.classList.add('btn-danger');
+          statusBadge.textContent = 'Active';
+          statusBadge.className = 'badge badge-success';
+          document.getElementById('ollama-model').textContent = 'llama2';
+          document.getElementById('ollama-latency').textContent = '~500ms';
+          showToast('Ollama server started', 'success');
+        }, 2000);
+      } else {
+        btn.textContent = 'Start';
+        btn.classList.remove('btn-danger');
+        btn.classList.add('btn-primary');
+        statusBadge.textContent = 'Standby';
+        statusBadge.className = 'badge badge-warning';
+        document.getElementById('ollama-model').textContent = '—';
+        document.getElementById('ollama-latency').textContent = '—';
+        showToast('Ollama server stopped', 'info');
+      }
+    }
+    
+    function refreshProviders() {
+      showToast('Provider status refreshed', 'info');
+    }
+    
+    // ===============================
+    // EXPORT FUNCTIONS
+    // ===============================
+    
+    function exportUsers() {
+      const data = demoUsers.map(u => ({
+        email: u.email,
+        name: u.full_name,
+        role: u.role,
+        status: u.is_active ? 'active' : 'inactive',
+        created: u.created_at
+      }));
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `users-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      showToast('Users exported successfully', 'success');
+    }
+    
+    function exportSessions() {
+      const data = demoSessions.map(s => ({
+        id: s.session_id,
+        type: s.scam_type,
+        confidence: s.confidence,
+        messages: s.total_messages,
+        duration: s.engagement_duration,
+        status: s.status,
+        created: s.created_at
+      }));
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sessions-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      showToast('Sessions exported successfully', 'success');
+    }
+    
+    function exportScammers() {
+      const data = demoScammers.map(s => ({
+        fingerprint: s.fingerprint_hash,
+        phones: s.phone_count,
+        emails: s.email_count,
+        sessions: s.total_sessions,
+        risk_score: s.risk_score,
+        threat_level: s.threat_level,
+        first_seen: s.first_seen
+      }));
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `scammers-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      showToast('Scammer database exported successfully', 'success');
+    }
+    
+    function exportSessionData() {
+      if (!currentSessionId) return;
+      const session = demoSessions.find(s => s.session_id === currentSessionId);
+      if (!session) return;
+      
+      const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `session-${currentSessionId}.json`;
+      a.click();
+      showToast('Session data exported', 'success');
+    }
+    
+    // ===============================
+    // SESSION MANAGEMENT
+    // ===============================
+    
+    function terminateCurrentSession() {
+      if (!currentSessionId) return;
+      showConfirm('Terminate Session', 'Are you sure you want to terminate this session?', () => {
+        const session = demoSessions.find(s => s.session_id === currentSessionId);
+        if (session) session.status = 'closed';
+        loadSessions();
+        closeSessionModal();
+        showToast('Session terminated', 'success');
+      });
+    }
+    
+    function terminateAllActiveSessions() {
+      const activeSessions = demoSessions.filter(s => s.status === 'active');
+      if (activeSessions.length === 0) {
+        showToast('No active sessions to terminate', 'info');
+        return;
+      }
+      
+      showConfirm('Terminate All Active Sessions', `Terminate ${activeSessions.length} active session(s)?`, () => {
+        activeSessions.forEach(s => s.status = 'closed');
+        loadSessions();
+        showToast(`${activeSessions.length} session(s) terminated`, 'success');
+      });
+    }
+    
+    // ===============================
+    // USER MANAGEMENT (EXTENDED)
+    // ===============================
+    
+    function deleteUser(userId) {
+      showConfirm('Delete User', 'Are you sure you want to delete this user? This action cannot be undone.', () => {
+        const index = demoUsers.findIndex(u => u.id === userId);
+        if (index > -1) {
+          demoUsers.splice(index, 1);
+          loadUsers();
+          closeUserModal();
+          showToast('User deleted successfully', 'success');
+        }
+      });
+    }
+    
+    function resetUserPassword(userId) {
+      showConfirm('Reset Password', 'Send password reset email to this user?', () => {
+        showToast('Password reset email sent', 'success');
+      });
+    }
+    
+    // ===============================
+    // SCAMMER MANAGEMENT
+    // ===============================
+    
+    function addToBlocklist() {
+      const modal = document.getElementById('user-modal');
+      document.getElementById('user-modal-title').textContent = 'Add to Blocklist';
+      document.getElementById('user-modal-body').innerHTML = `
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-control" id="blocklist-type">
+            <option value="phone">Phone Number</option>
+            <option value="email">Email Address</option>
+            <option value="upi">UPI ID</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Value</label>
+          <input type="text" class="form-control" id="blocklist-value" placeholder="Enter phone, email, or UPI...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reason</label>
+          <textarea class="form-control" id="blocklist-reason" rows="3" placeholder="Reason for blocking..."></textarea>
+        </div>
+      `;
+      document.getElementById('user-modal-action').textContent = 'Add to Blocklist';
+      document.getElementById('user-modal-action').onclick = () => {
+        const value = document.getElementById('blocklist-value').value;
+        if (!value) {
+          showToast('Please enter a value', 'error');
+          return;
+        }
+        showToast('Added to blocklist successfully', 'success');
+        closeUserModal();
+      };
+      modal.classList.add('active');
+    }
+    
+    // ===============================
+    // CONFIRMATION MODAL
+    // ===============================
+    
+    function showConfirm(title, message, callback) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-message').textContent = message;
+      confirmCallback = callback;
+      document.getElementById('confirm-action-btn').onclick = () => {
+        if (confirmCallback) confirmCallback();
+        closeConfirmModal();
+      };
+      document.getElementById('confirm-modal').classList.add('active');
+    }
+    
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.remove('active');
+      confirmCallback = null;
+    }
+    
+    // ===============================
+    // INITIALIZATION
+    // ===============================
+    
+    // Load logs and threats on init
+    setTimeout(() => {
+      loadLogs();
+      loadThreats();
+      loadSettings();
+    }, 500);
+    
+    // Add animation styles
+    const toastStyles = document.createElement('style');
+    toastStyles.textContent = `
+      @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+      .badge-outline { background: transparent; border: 1px solid rgba(245,242,235,0.3); }
+    `;
+    document.head.appendChild(toastStyles);
+  </script>
+</body>
+</html>
