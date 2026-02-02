@@ -5,7 +5,8 @@ Loads all settings from environment variables with defaults.
 """
 
 from pydantic_settings import BaseSettings
-from typing import Optional, List
+from pydantic import field_validator
+from typing import Optional, List, Union
 from functools import lru_cache
 
 
@@ -97,7 +98,22 @@ class Settings(BaseSettings):
     # ============================================================
     # CORS SETTINGS
     # ============================================================
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: str = "*"
+    
+    @field_validator('CORS_ORIGINS', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v):
+        """Parse CORS_ORIGINS from string or list"""
+        if isinstance(v, list):
+            return ','.join(v)
+        return v
+    
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Get CORS origins as a list"""
+        if self.CORS_ORIGINS == "*":
+            return ["*"]
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(',') if origin.strip()]
     
     # ============================================================
     # RATE LIMITING
